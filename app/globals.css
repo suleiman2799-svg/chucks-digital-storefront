@@ -93,3 +93,9 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 @media(max-width:740px){.department-filter{flex-wrap:nowrap;overflow-x:auto;padding:2px 18px 12px;margin:0 -18px 18px;scrollbar-width:none}.department-filter::-webkit-scrollbar{display:none}.department-filter button{flex:0 0 auto}.door:hover{transform:none}.door:active{transform:translateY(-3px) scale(.98)}}
 @media(max-width:650px){.wing-enter{opacity:1;transform:translate(-50%,0);font-size:5px}.entry-portal:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){.door,.door .arch,.door .arch:after,.wing-card,.wing-arch,.entry-portal,.arrival-primary{transition:none!important}}
+
+.invitation-door{display:block;text-decoration:none;cursor:pointer;transition:transform .45s,filter .35s}
+.invitation-door:hover,.invitation-door:focus-visible{transform:translateY(-8px) perspective(900px) rotateY(-4deg);filter:brightness(1.16);outline:2px solid #d34b9866;outline-offset:5px}
+.invitation-door:active{transform:scale(.98)}
+@media(hover:none){.invitation-door:active{transform:scale(.97);filter:brightness(1.14)}}
+@media(prefers-reduced-motion:reduce){.invitation-door{transition:none!important}}
