@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Chucks Shopping Mall — Step Inside",
-  description: "A new way to experience shopping at Chucks Shopping Mall, Lokoja. Explore the visual prototype."
+  title: "Chucks Shopping Mall — More Than a Place to Shop",
+  description: "Discover Chucks Shopping Mall in Lokoja — a place for little discoveries, unexpected favourites and good days."
 };
 
 export default function RootLayout({ children }) {
