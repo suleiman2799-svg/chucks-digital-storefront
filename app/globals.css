@@ -99,3 +99,8 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 .invitation-door:active{transform:scale(.98)}
 @media(hover:none){.invitation-door:active{transform:scale(.97);filter:brightness(1.14)}}
 @media(prefers-reduced-motion:reduce){.invitation-door{transition:none!important}}
+
+.door.is-entering{transform:translateY(-5px) scale(.985);box-shadow:0 0 0 2px var(--pink),0 22px 40px #25272b25}
+.door.is-entering .arch:after{transform:perspective(450px) rotateY(-78deg);opacity:1}
+.door.is-entering .round{background:var(--ink);color:white;transform:rotate(45deg)}
+@media(hover:none){.door.is-entering{transform:translateY(-4px) scale(.985)}}
