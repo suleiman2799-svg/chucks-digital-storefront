@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 
 const wings = [
-  { n: "01", name: "THE ATRIUM", detail: "A little room for everything", tone: "rose" },
-  { n: "02", name: "THE GALLERIES", detail: "Discover your next favourite", tone: "green" },
-  { n: "03", name: "THE TERRACE", detail: "Make a day of it", tone: "gold" },
+  { n: "01", name: "THE ATRIUM", detail: "A little room for everything", tone: "rose", department: "Fashion" },
+  { n: "02", name: "THE GALLERIES", detail: "Discover your next favourite", tone: "green", department: "Electronics" },
+  { n: "03", name: "THE TERRACE", detail: "Make a day of it", tone: "gold", department: "Home & Living" },
 ];
 export default function Landing() {
   const [ready, setReady] = useState(false);
@@ -36,7 +36,7 @@ export default function Landing() {
           <div className="roof-line" />
           <div className="upper-volume"><div className="upper-window"><i/><i/><i/><i/></div><div className="upper-sign">A PLACE TO DISCOVER</div></div>
           <div className="colonnade"><i/><i/><i/><i/><i/><i/></div>
-          <div className="glass-lobby"><div className="lobby-light"/><div className="lobby-stairs"/><div className="lobby-plants">✳</div><div className="entry-portal"><span>COME ON IN</span><b>c.</b></div></div>
+          <div className="glass-lobby"><div className="lobby-light"/><div className="lobby-stairs"/><div className="lobby-plants">✳</div><a className="entry-portal" href="/shop" aria-label="Enter Chucks Shopping Mall"><span>COME ON IN</span><b>c.</b><small className="portal-enter">OPEN THE DOORS ↗</small></a></div>
           <div className="mall-plinth"><span>CHUCKS SHOPPING MALL</span><span>LOKOJA · NIGERIA</span></div>
         </div>
         <div className="architecture-shadow" />
@@ -53,7 +53,7 @@ export default function Landing() {
     </section>
     <section className="arrival-wings">
       <div className="wings-heading"><div><span className="arrival-kicker"><span/> THE MALL, IN THREE MOMENTS</span><h2>Room to<br/><em>find your thing.</em></h2></div><p>Every visit starts somewhere. Take a first look at the spaces and moments that make up the Chucks experience.</p></div>
-      <div className="wing-grid">{wings.map((w,i)=><article className={"wing-card wing-"+w.tone} key={w.n}><div className="wing-art"><div className="wing-arch"><div/><i/><b>{w.n}</b></div><span className="wing-orbit">✳</span></div><div className="wing-meta"><span>{w.n} / 03</span><span>THE CHUCKS WORLD</span></div><h3>{w.name}</h3><p>{w.detail}</p></article>)}</div>
+      <div className="wing-grid">{wings.map((w)=><a className={"wing-card wing-"+w.tone} key={w.n} href={"/shop?department="+encodeURIComponent(w.department)+"#picks"} aria-label={"Explore "+w.department}><div className="wing-art"><div className="wing-arch"><div/><i/><b>{w.n}</b></div><span className="wing-orbit">✳</span><span className="wing-enter">ENTER DEPARTMENT ↗</span></div><div className="wing-meta"><span>{w.n} / 03</span><span>{w.department.toUpperCase()}</span></div><h3>{w.name}</h3><p>{w.detail}</p></a>)}</div>
     </section>
     <section className="arrival-invitation" id="visit-chucks"><div className="invitation-orb"/><div className="invitation-copy"><span className="arrival-kicker"><span/> YOUR NEXT DISCOVERY STARTS HERE</span><h2>Shall we<br/><em>step inside?</em></h2><p>Explore the store, wander through the collections and see what catches your eye.</p><a href="/shop" className="arrival-primary">ENTER CHUCKS <span>↗</span></a></div><div className="invitation-door"><div className="door-frame"><div className="door-glass"><span>c.</span><small>WELCOME IN</small></div><div className="door-glass second"/></div><div className="door-step"/></div><div className="invitation-foot"><span>CHUCKS SHOPPING MALL · LOKOJA, NIGERIA</span><span>THE DOORS TO DISCOVERY ARE OPEN ↗</span></div></section>
     <footer className="arrival-footer"><a className="arrival-brand" href="/"><span>c<span>.</span></span><b>CHUCKS<small>SHOPPING MALL · LOKOJA</small></b></a><div className="arrival-footer-links"><a href="#architecture">BACK TO TOP ↑</a><a href="/shop">ENTER STORE ↗</a></div><p>A LITTLE BIT OF EVERYTHING. A WHOLE LOT TO DISCOVER.</p><div className="arrival-legal"><span>© 2026 CHUCKS SHOPPING MALL</span><span>VISUAL PROTOTYPE · SAMPLE EXPERIENCE</span><span>LOKOJA, NIGERIA</span></div><div className="arrival-credit">DESIGNED &amp; DEVELOPED BY <a href="https://github.com/suleiman2799-svg" target="_blank" rel="noreferrer">suleiman_cr7</a></div>
