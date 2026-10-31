@@ -47,3 +47,49 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 @media(max-width:900px){.arrival-hero{padding:0 6%;}.arrival-copy{width:53%}.architecture{width:64%;right:-8%}.arrival-intro{padding:80px 7%;grid-template-columns:.35fr 1.5fr .55fr;gap:3%}.intro-stamp{width:130px;height:130px}.arrival-wings{padding:85px 6%}.wing-art{height:205px}.invitation-door{right:7%;width:31%}}
 @media(max-width:650px){.arrival-nav{height:69px;padding:0 18px}.arrival-brand>span{font-size:40px}.arrival-brand>b{font-size:11px}.arrival-nav-links,.arrival-nav-cta{display:none}.arrival-menu{display:block;border:1px solid #ffffff35;border-radius:50%;width:37px;height:37px;background:transparent;color:white;font-size:17px}.arrival-mobile-menu{display:flex;position:absolute;z-index:12;top:69px;left:0;right:0;background:#202329;padding:20px;flex-direction:column;gap:18px;border-bottom:1px solid #ffffff22}.arrival-mobile-menu a{font-size:10px;letter-spacing:.14em;color:white}.arrival-hero{height:auto;min-height:790px;max-height:none;padding:0 22px;display:block;background:radial-gradient(ellipse at 50% 67%,#38303b,#1c1f24 60%,#17191d)}.arrival-hero:before{background:linear-gradient(180deg,#17191d 0%,#17191d88 40%,transparent 68%,#17191d 100%)}.arrival-coordinate{top:29px;left:22px;font-size:6px}.arrival-copy{padding:100px 0 0;width:100%;transform:translateY(12px)}.arrival-kicker{font-size:6px;letter-spacing:.14em}.arrival-copy h1{font-size:clamp(66px,17vw,92px);margin:25px 0 18px}.arrival-copy>p{font-size:10px;max-width:280px;margin-bottom:19px}.arrival-actions{gap:14px}.arrival-primary{height:44px;padding:0 16px;gap:17px;font-size:7px}.arrival-secondary{font-size:6px}.architecture{width:118%;height:47%;right:-12%;top:auto;bottom:74px;transform:translateY(12px) scale(.97)}.arrival-ready .architecture{transform:translateY(0) scale(1)}.mall-building{width:75%;height:75%;right:10%;top:8%;transform:rotateY(-12deg) scale(.98)}.roof-cap{font-size:22px}.upper-volume{height:24%}.glass-lobby{height:43%}.entry-portal b{font-size:43px}.arch-floor{bottom:9%;height:18%}.marker-a{left:0;top:25%;padding:8px}.marker-b{right:1%;bottom:8%;padding:8px}.floating-marker{font-size:5px}.hero-bottomline{left:22px;right:22px;bottom:18px;font-size:5px;letter-spacing:.09em}.hero-bottomline span:nth-child(2){display:none}.vertical-note{display:none}.arrival-orbit.orbit-one{width:430px;height:430px;right:-45%;top:38%}.arrival-orbit.orbit-two{width:560px;height:560px;right:-60%;top:30%}.arrival-intro{padding:65px 23px;display:grid;grid-template-columns:1fr 95px;gap:18px}.intro-index{grid-column:1/-1}.intro-content{grid-column:1;grid-row:2}.intro-overline{font-size:6px;line-height:1.7}.intro-content h2{font-size:clamp(42px,11vw,59px);margin:17px 0}.intro-description{font-size:9px}.intro-stamp{grid-column:2;grid-row:2;width:90px;height:90px;align-self:center}.intro-stamp span{font-size:8px}.intro-stamp b{font-size:15px}.intro-stamp small{font-size:4px}.arrival-wings{padding:68px 20px 75px}.wings-heading{display:block;margin-bottom:27px}.wings-heading h2{font-size:54px;margin:18px 0}.wings-heading>p{font-size:9px;max-width:300px}.wing-grid{grid-template-columns:1fr;gap:12px}.wing-card{display:grid;grid-template-columns:42% 1fr;grid-template-rows:auto auto 1fr;column-gap:16px;padding:10px;min-height:155px}.wing-art{grid-row:1/4;height:135px}.wing-arch{width:55%;height:78%;border-width:6px}.wing-arch>b{font-size:25px}.wing-orbit{font-size:18px}.wing-meta{margin:13px 0 7px;align-self:end;font-size:5px}.wing-card h3{font-size:20px;align-self:center}.wing-card>p{font-size:8px;align-self:start}.arrival-invitation{min-height:590px;padding:65px 23px 70px;display:block}.invitation-copy{width:100%}.invitation-copy h2{font-size:69px;margin:20px 0}.invitation-copy>p{font-size:9px;max-width:275px}.invitation-door{right:12%;width:44%;height:42%;bottom:47px}.door-frame{bottom:18px;padding:9px;gap:4px}.door-glass{border-width:3px}.door-glass>span{font-size:45px}.door-step{height:18px}.invitation-foot{left:23px;right:23px;bottom:17px;font-size:5px}.invitation-foot span:last-child{display:none}.arrival-footer{padding:35px 22px 20px}.arrival-footer-links{right:22px;top:48px;gap:13px}.arrival-footer-links a{font-size:6px}.arrival-footer>p{font-size:7px;margin:20px 0}.arrival-legal{flex-wrap:wrap;gap:9px;font-size:5px}.arrival-credit{font-size:6px}.arrival-grain{opacity:.08}}
 @media(prefers-reduced-motion:reduce){.arrival *, .arrival *:before,.arrival *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.arrival-copy,.architecture{opacity:1;transform:none}}
+
+
+/* Interactive department portals and tactile 3D feedback */
+.door{position:relative;display:block;perspective:900px;transform-style:preserve-3d;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s,filter .35s}
+.door:hover,.door:focus-visible{transform:translateY(-9px) rotateX(2deg);box-shadow:0 24px 38px #25272b20;filter:saturate(1.08);outline:none}
+.door:active{transform:translateY(-2px) scale(.985)}
+.door .arch{transform:translateZ(0);transition:transform .45s cubic-bezier(.2,.7,.2,1);box-shadow:inset 0 0 0 1px #fff8}
+.door:hover .arch,.door:focus-visible .arch{transform:translateZ(18px) scale(.985)}
+.door .arch:after{content:"";position:absolute;z-index:4;inset:8px 8px 0;border-radius:75px 75px 0 0;background:linear-gradient(90deg,#fff2,transparent 35%,#fff1);transform:perspective(450px) rotateY(0);transform-origin:left;transition:transform .55s cubic-bezier(.2,.7,.2,1),opacity .3s;opacity:.65;pointer-events:none}
+.door:hover .arch:after,.door:focus-visible .arch:after{transform:perspective(450px) rotateY(-22deg);opacity:.9}
+.door:focus-visible{outline:3px solid var(--pink);outline-offset:4px}
+.door-bottom .round{transition:transform .3s,background .3s,color .3s}
+.door:hover .round,.door:focus-visible .round{transform:rotate(45deg);background:var(--ink);color:white}
+.department-filter{display:flex;flex-wrap:wrap;gap:8px;margin:-19px 0 25px}
+.department-filter button{border:1px solid var(--line);background:#fff;border-radius:30px;padding:10px 14px;font-size:8px;font-weight:800;color:#827a76;transition:background .2s,color .2s,transform .2s}
+.department-filter button:hover{transform:translateY(-2px);border-color:#d9a0bd;color:var(--pink)}
+.department-filter button.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.wish{transition:transform .2s,background .2s,color .2s}
+.wish:active{transform:scale(.88)}
+.wish.is-saved{background:var(--pink);color:#fff}
+.wish.is-saved svg{fill:#fff}
+.wishlist-trigger{position:relative}
+.wishlist-trigger span{position:absolute;right:0;top:0;min-width:14px;height:14px;border-radius:9px;background:var(--pink);color:white;font-size:8px;display:grid;place-items:center}
+.collection{transition:transform .35s,box-shadow .35s}
+.collection:hover,.collection:focus-visible{transform:translateY(-5px);box-shadow:0 20px 36px #25272b18;outline:2px solid #ffffff80;outline-offset:-5px}
+.collection:active{transform:scale(.99)}
+.footer-links form button{transition:transform .2s,filter .2s}
+.footer-links form button:hover{transform:translateX(3px);filter:brightness(1.12)}
+.entry-portal{color:inherit;text-decoration:none;cursor:pointer;transition:filter .35s,box-shadow .35s,transform .45s;transform-style:preserve-3d}
+.entry-portal:hover,.entry-portal:focus-visible{filter:brightness(1.28);box-shadow:0 0 0 2px #f28bc2,0 0 45px #d34b9877,inset 0 0 45px #fff4;transform:translateZ(16px) scale(1.025);outline:none}
+.entry-portal:active{transform:scale(.98)}
+.portal-enter{position:absolute;bottom:8%;font-size:5px;letter-spacing:.16em;color:#fff;opacity:0;transform:translateY(5px);transition:opacity .25s,transform .25s}
+.entry-portal:hover .portal-enter,.entry-portal:focus-visible .portal-enter{opacity:1;transform:translateY(0)}
+.wing-card{position:relative;display:block;text-decoration:none;cursor:pointer;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s,filter .35s}
+.wing-card:hover,.wing-card:focus-visible{transform:translateY(-8px) perspective(900px) rotateX(2deg);box-shadow:0 24px 45px #0002;filter:saturate(1.12);outline:2px solid #d34b9866;outline-offset:3px}
+.wing-card:active{transform:scale(.985)}
+.wing-art{perspective:800px}
+.wing-arch{transition:transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .4s}
+.wing-card:hover .wing-arch,.wing-card:focus-visible .wing-arch{transform:rotateY(-10deg) translateZ(15px);box-shadow:18px 18px 25px #0002}
+.wing-enter{position:absolute;left:50%;bottom:12px;transform:translate(-50%,8px);font-size:6px;letter-spacing:.15em;color:#fff;background:#17191dd9;padding:8px 10px;border-radius:30px;white-space:nowrap;opacity:0;transition:opacity .25s,transform .25s}
+.wing-card:hover .wing-enter,.wing-card:focus-visible .wing-enter{opacity:1;transform:translate(-50%,0)}
+.arrival-mobile-menu a:active{color:#f28bc2}
+@media(hover:none){.door:active .arch:after{transform:perspective(450px) rotateY(-22deg);opacity:.9}.wing-card:active .wing-arch{transform:rotateY(-8deg) scale(.98)}.portal-enter{opacity:1;transform:none}}
+@media(max-width:740px){.department-filter{flex-wrap:nowrap;overflow-x:auto;padding:2px 18px 12px;margin:0 -18px 18px;scrollbar-width:none}.department-filter::-webkit-scrollbar{display:none}.department-filter button{flex:0 0 auto}.door:hover{transform:none}.door:active{transform:translateY(-3px) scale(.98)}}
+@media(max-width:650px){.wing-enter{opacity:1;transform:translate(-50%,0);font-size:5px}.entry-portal:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.door,.door .arch,.door .arch:after,.wing-card,.wing-arch,.entry-portal,.arrival-primary{transition:none!important}}
