@@ -91,21 +91,6 @@ export default function Landing() {
         <p>A world of little discoveries, unexpected favourites and good days — all under one roof.</p>
         <div className="arrival-actions"><a className="arrival-primary" href="/shop">ENTER THE MALL <span>↗</span></a><a className="arrival-secondary" href="#discover">EXPLORE THE EXPERIENCE <span>↓</span></a></div>
       </div>
-      <div className="architecture" aria-label="A stylised architectural rendering of the Chucks Shopping Mall entrance">
-        <div className="architecture-halo" />
-        <div className="arch-floor floor-back" /><div className="arch-floor floor-front" />
-        <div className="mall-building">
-          <div className="roof-cap"><span>CHUCKS</span><i>✳</i></div>
-          <div className="roof-line" />
-          <div className="upper-volume"><div className="upper-window"><i/><i/><i/><i/></div><div className="upper-sign">A PLACE TO DISCOVER</div></div>
-          <div className="colonnade"><i/><i/><i/><i/><i/><i/></div>
-          <div className="glass-lobby"><div className="lobby-light"/><div className="lobby-stairs"/><div className="lobby-plants">✳</div><a className="entry-portal" href="/shop" aria-label="Enter Chucks Shopping Mall"><span>COME ON IN</span><b>c.</b><small className="portal-enter">OPEN THE DOORS ↗</small></a></div>
-          <div className="mall-plinth"><span>CHUCKS SHOPPING MALL</span><span>LOKOJA · NIGERIA</span></div>
-        </div>
-        <div className="architecture-shadow" />
-        <div className="floating-marker marker-a"><b>01</b><span>THE ATRIUM</span></div>
-        <div className="floating-marker marker-b"><b>✳</b><span>OPEN TO DISCOVERY</span></div>
-      </div>
       <div className="hero-bottomline"><span>DESIGNED FOR THE EVERYDAY EXTRAORDINARY</span><span>SCROLL TO TAKE A CLOSER LOOK&nbsp; ↓</span><span>01 / 03</span></div>
       <div className="vertical-note">A NEW WAY TO EXPERIENCE CHUCKS</div>
     </section>
