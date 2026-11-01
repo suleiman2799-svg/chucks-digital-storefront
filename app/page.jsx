@@ -9,9 +9,7 @@ const wings = [
 export default function Landing() {
   const [ready, setReady] = useState(false);
   const [menu, setMenu] = useState(false);
-  const [playLogo, setPlayLogo] = useState(false);
   useEffect(() => { const t = window.setTimeout(() => setReady(true), 120); return () => window.clearTimeout(t); }, []);
-  useEffect(() => { try { const key = "chucks-logo-reveal-played"; if (!window.sessionStorage.getItem(key)) { window.sessionStorage.setItem(key, "1"); setPlayLogo(true); } } catch { setPlayLogo(true); } }, []);
   return <main className={"arrival " + (ready ? "arrival-ready" : "")}>
     <div className="arrival-grain" aria-hidden="true" />
     <header className="arrival-nav">
@@ -26,7 +24,7 @@ export default function Landing() {
       <div className="arrival-orbit orbit-one" /><div className="arrival-orbit orbit-two" />
       <div className="arrival-coordinate">07°48' N&nbsp;&nbsp; 06°44' E <i /> LOKOJA, NIGERIA</div>
       <div className="arrival-copy">
-        <div className="arrival-logo-reveal" aria-label="Chucks Shopping Mall logo"><img src={playLogo?"/assets/chucks-logo.svg":"/assets/chucks-logo.png"} alt="Chucks Shopping Mall logo" /></div>
+        <div className="arrival-logo-reveal" aria-label="Chucks Shopping Mall logo"><img src="/assets/chucks-logo.svg" alt="Chucks Shopping Mall logo" /></div>
         <div className="arrival-kicker"><span /> A NEW LANDMARK FOR EVERYDAY DISCOVERY</div>
         <h1>More than<br />a place to <em>shop.</em></h1>
         <p>A world of little discoveries, unexpected favourites and good days — all under one roof.</p>
