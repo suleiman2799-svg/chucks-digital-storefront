@@ -9,11 +9,13 @@ const wings = [
 export default function Landing() {
   const [ready, setReady] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [playLogo, setPlayLogo] = useState(false);
   useEffect(() => { const t = window.setTimeout(() => setReady(true), 120); return () => window.clearTimeout(t); }, []);
+  useEffect(() => { try { const key = "chucks-logo-reveal-played"; if (!window.sessionStorage.getItem(key)) { window.sessionStorage.setItem(key, "1"); setPlayLogo(true); } } catch { setPlayLogo(true); } }, []);
   return <main className={"arrival " + (ready ? "arrival-ready" : "")}>
     <div className="arrival-grain" aria-hidden="true" />
     <header className="arrival-nav">
-      <a className="arrival-brand" href="/" aria-label="Chucks Shopping Mall home"><span>c<span>.</span></span><b>CHUCKS<small>SHOPPING MALL · LOKOJA</small></b></a>
+      <a className="arrival-brand" href="/" aria-label="Chucks Shopping Mall home"><img className="arrival-brand-mark" src="/assets/chucks-logo.png" alt="" aria-hidden="true"/><b>CHUCKS<small>SHOPPING MALL · LOKOJA</small></b></a>
       <div className="arrival-nav-links"><a href="#architecture">THE MALL</a><a href="#discover">DISCOVER</a><a href="#visit-chucks">FIND US</a></div>
       <a className="arrival-nav-cta" href="/shop">ENTER STORE <span>↗</span></a>
       <button className="arrival-menu" onClick={() => setMenu(!menu)} aria-label="Toggle navigation">{menu ? "×" : "☰"}</button>
@@ -22,7 +24,7 @@ export default function Landing() {
     <section className="arrival-hero" id="architecture">
       <div className="arrival-orbit orbit-one" /><div className="arrival-orbit orbit-two" />
       <div className="arrival-coordinate">07°48' N&nbsp;&nbsp; 06°44' E <i /> LOKOJA, NIGERIA</div>
-      <div className="arrival-copy">
+      <div className="arrival-copy">\n        <div className="arrival-logo-reveal" aria-label="Chucks Shopping Mall logo"><img src={playLogo?"/assets/chucks-logo.svg":"/assets/chucks-logo.png"} alt="Chucks Shopping Mall logo" /></div>
         <div className="arrival-kicker"><span /> A NEW LANDMARK FOR EVERYDAY DISCOVERY</div>
         <h1>More than<br />a place to <em>shop.</em></h1>
         <p>A world of little discoveries, unexpected favourites and good days — all under one roof.</p>
@@ -56,7 +58,7 @@ export default function Landing() {
       <div className="wing-grid">{wings.map((w)=><a className={"wing-card wing-"+w.tone} key={w.n} href={"/shop?department="+encodeURIComponent(w.department)+"#picks"} aria-label={"Explore "+w.department}><div className="wing-art"><div className="wing-arch"><div/><i/><b>{w.n}</b></div><span className="wing-orbit">✳</span><span className="wing-enter">ENTER DEPARTMENT ↗</span></div><div className="wing-meta"><span>{w.n} / 03</span><span>{w.department.toUpperCase()}</span></div><h3>{w.name}</h3><p>{w.detail}</p></a>)}</div>
     </section>
     <section className="arrival-invitation" id="visit-chucks"><div className="invitation-orb"/><div className="invitation-copy"><span className="arrival-kicker"><span/> YOUR NEXT DISCOVERY STARTS HERE</span><h2>Shall we<br/><em>step inside?</em></h2><p>Explore the store, wander through the collections and see what catches your eye.</p><a href="/shop" className="arrival-primary">ENTER CHUCKS <span>↗</span></a></div><a className="invitation-door" href="/shop" aria-label="Walk through the Chucks entrance and enter the store"><div className="door-frame"><div className="door-glass"><span>c.</span><small>WELCOME IN</small></div><div className="door-glass second"/></div><div className="door-step"/></a><div className="invitation-foot"><span>CHUCKS SHOPPING MALL · LOKOJA, NIGERIA</span><span>THE DOORS TO DISCOVERY ARE OPEN ↗</span></div></section>
-    <footer className="arrival-footer"><a className="arrival-brand" href="/"><span>c<span>.</span></span><b>CHUCKS<small>SHOPPING MALL · LOKOJA</small></b></a><div className="arrival-footer-links"><a href="#architecture">BACK TO TOP ↑</a><a href="/shop">ENTER STORE ↗</a></div><p>A LITTLE BIT OF EVERYTHING. A WHOLE LOT TO DISCOVER.</p><div className="arrival-legal"><span>© 2026 CHUCKS SHOPPING MALL</span><span>VISUAL PROTOTYPE · SAMPLE EXPERIENCE</span><span>LOKOJA, NIGERIA</span></div><div className="arrival-credit">DESIGNED &amp; DEVELOPED BY <a href="https://github.com/suleiman2799-svg" target="_blank" rel="noreferrer">suleiman_cr7</a></div>
+    <footer className="arrival-footer"><a className="arrival-brand" href="/"><img className="arrival-brand-mark" src="/assets/chucks-logo.png" alt="" aria-hidden="true"/><b>CHUCKS<small>SHOPPING MALL · LOKOJA</small></b></a><div className="arrival-footer-links"><a href="#architecture">BACK TO TOP ↑</a><a href="/shop">ENTER STORE ↗</a></div><p>A LITTLE BIT OF EVERYTHING. A WHOLE LOT TO DISCOVER.</p><div className="arrival-legal"><span>© 2026 CHUCKS SHOPPING MALL</span><span>VISUAL PROTOTYPE · SAMPLE EXPERIENCE</span><span>LOKOJA, NIGERIA</span></div><div className="arrival-credit">DESIGNED &amp; DEVELOPED BY <a href="https://github.com/suleiman2799-svg" target="_blank" rel="noreferrer">suleiman_cr7</a></div>
     </footer>
   </main>;
 }
