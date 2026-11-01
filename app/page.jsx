@@ -22,6 +22,7 @@ export default function Landing() {
     </header>
     {menu && <nav className="arrival-mobile-menu"><a href="#architecture" onClick={() => setMenu(false)}>The mall</a><a href="#discover" onClick={() => setMenu(false)}>Discover</a><a href="/shop">Enter store ↗</a></nav>}
     <section className="arrival-hero" id="architecture">
+      <video className="arrival-hero-video" autoPlay muted loop playsInline preload="metadata" poster="/assets/chucks-mall-poster.svg" aria-hidden="true" tabIndex={-1}><source src="/assets/chucks-mall-hero.mp4" type="video/mp4" /></video>
       <div className="arrival-orbit orbit-one" /><div className="arrival-orbit orbit-two" />
       <div className="arrival-coordinate">07°48' N&nbsp;&nbsp; 06°44' E <i /> LOKOJA, NIGERIA</div>
       <div className="arrival-copy">
