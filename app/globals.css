@@ -116,3 +116,43 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 .arrival-brand>span{display:none}
 @media(max-width:650px){.arrival-logo-reveal{width:76px;margin-bottom:14px}.arrival-brand-mark{width:34px;height:34px}.brand-mark{width:36px;height:36px}.footer-brand .brand-mark{width:40px;height:40px}}
 @media(prefers-reduced-motion:reduce){.arrival-logo-reveal{filter:none}}
+
+
+/* Cinematic 3.6s assembly — deliberately large hero signature */
+.arrival-logo-reveal{
+  width:clamp(260px,30vw,390px);
+  max-width:100%;
+  margin:0 auto 24px;
+  position:relative;
+  isolation:isolate;
+  filter:drop-shadow(0 14px 34px #d34b9840);
+}
+.arrival-logo-reveal img{
+  display:block;width:100%;height:auto;object-fit:contain;overflow:visible;
+}
+.arrival-logo-reveal:after{
+  content:"";position:absolute;inset:-5% -12%;z-index:2;pointer-events:none;
+  background:linear-gradient(108deg,transparent 40%,#ffffff08 46%,#ffffffc9 50%,#f6c9e4a0 53%,transparent 61%);
+  transform:translateX(-145%);mix-blend-mode:screen;
+  animation:chucks-logo-light-sweep 3.7s ease-in-out 2.65s both;
+}
+@keyframes chucks-logo-light-sweep{
+  0%{opacity:0;transform:translateX(-145%)}
+  12%{opacity:.9}
+  72%{opacity:.65;transform:translateX(145%)}
+  100%{opacity:0;transform:translateX(145%)}
+}
+@media(max-width:900px){
+  .arrival-logo-reveal{width:clamp(250px,36vw,340px);margin-bottom:20px}
+}
+@media(max-width:650px){
+  .arrival-logo-reveal{width:min(68vw,270px);min-width:210px;margin:0 auto 20px}
+  .arrival-copy{padding-top:82px}
+}
+@media(max-width:380px){
+  .arrival-logo-reveal{width:min(66vw,235px);min-width:190px}
+}
+@media(prefers-reduced-motion:reduce){
+  .arrival-logo-reveal:after{display:none;animation:none}
+  .arrival-logo-reveal{filter:none}
+}
