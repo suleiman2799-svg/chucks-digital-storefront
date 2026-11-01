@@ -24,7 +24,8 @@ export default function Landing() {
     <section className="arrival-hero" id="architecture">
       <div className="arrival-orbit orbit-one" /><div className="arrival-orbit orbit-two" />
       <div className="arrival-coordinate">07°48' N&nbsp;&nbsp; 06°44' E <i /> LOKOJA, NIGERIA</div>
-      <div className="arrival-copy">\n        <div className="arrival-logo-reveal" aria-label="Chucks Shopping Mall logo"><img src={playLogo?"/assets/chucks-logo.svg":"/assets/chucks-logo.png"} alt="Chucks Shopping Mall logo" /></div>
+      <div className="arrival-copy">
+        <div className="arrival-logo-reveal" aria-label="Chucks Shopping Mall logo"><img src={playLogo?"/assets/chucks-logo.svg":"/assets/chucks-logo.png"} alt="Chucks Shopping Mall logo" /></div>
         <div className="arrival-kicker"><span /> A NEW LANDMARK FOR EVERYDAY DISCOVERY</div>
         <h1>More than<br />a place to <em>shop.</em></h1>
         <p>A world of little discoveries, unexpected favourites and good days — all under one roof.</p>
