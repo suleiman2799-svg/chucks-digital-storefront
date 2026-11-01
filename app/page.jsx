@@ -9,7 +9,52 @@ const wings = [
 export default function Landing() {
   const [ready, setReady] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [videoDebug, setVideoDebug] = useState(false);
+  const [videoStats, setVideoStats] = useState(null);
   useEffect(() => { const t = window.setTimeout(() => setReady(true), 120); return () => window.clearTimeout(t); }, []);
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("video-debug") !== "1") return;
+    setVideoDebug(true);
+    const video = document.querySelector(".arrival-hero-video");
+    if (!video) {
+      setVideoStats({ detected: false });
+      return;
+    }
+    const errorMessages = {
+      1: "MEDIA_ERR_ABORTED — loading aborted",
+      2: "MEDIA_ERR_NETWORK — network error",
+      3: "MEDIA_ERR_DECODE — decoding failed",
+      4: "MEDIA_ERR_SRC_NOT_SUPPORTED — source unsupported"
+    };
+    const update = (eventName) => {
+      const rect = video.getBoundingClientRect();
+      setVideoStats({
+        detected: true,
+        readyState: video.readyState,
+        paused: video.paused,
+        currentTime: Number.isFinite(video.currentTime) ? video.currentTime : 0,
+        videoWidth: video.videoWidth,
+        videoHeight: video.videoHeight,
+        renderedWidth: Math.round(rect.width),
+        renderedHeight: Math.round(rect.height),
+        errorCode: video.error?.code ?? 0,
+        errorMessage: video.error ? (video.error.message || errorMessages[video.error.code] || "Unknown media error") : "None",
+        event: eventName || "Polling"
+      });
+    };
+    const events = ["loadedmetadata", "loadeddata", "canplay", "play", "playing", "pause", "waiting", "stalled", "error", "timeupdate"];
+    const handlers = events.map((name) => {
+      const handler = () => update(name);
+      video.addEventListener(name, handler);
+      return [name, handler];
+    });
+    update("Mounted");
+    const timer = window.setInterval(() => update("Polling"), 500);
+    return () => {
+      window.clearInterval(timer);
+      handlers.forEach(([name, handler]) => video.removeEventListener(name, handler));
+    };
+  }, []);
   return <main className={"arrival " + (ready ? "arrival-ready" : "")}>
     <div className="arrival-grain" aria-hidden="true" />
     <header className="arrival-nav">
@@ -21,6 +66,22 @@ export default function Landing() {
     {menu && <nav className="arrival-mobile-menu"><a href="#architecture" onClick={() => setMenu(false)}>The mall</a><a href="#discover" onClick={() => setMenu(false)}>Discover</a><a href="/shop">Enter store ↗</a></nav>}
     <section className="arrival-hero" id="architecture">
       <video className="arrival-hero-video" autoPlay muted loop playsInline preload="metadata" poster="/assets/chucks-mall-poster.svg" aria-hidden="true" tabIndex={-1}><source src="/assets/chucks-mall-hero.mp4" type="video/mp4" /></video>
+      {videoDebug && <aside aria-live="polite" style={{ position: "fixed", right: 8, bottom: "max(8px, env(safe-area-inset-bottom))", zIndex: 9999, width: "min(250px, calc(100vw - 16px))", padding: "9px 11px", border: "1px solid rgba(255,255,255,.24)", borderRadius: 9, background: "rgba(12,14,18,.88)", color: "#f5f3f2", font: "10px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace", boxShadow: "0 4px 18px rgba(0,0,0,.28)", pointerEvents: "none" }}>
+        <div style={{ font: "700 10px/1.4 Arial,sans-serif", letterSpacing: ".08em", marginBottom: 5, color: "#f2a4ce" }}>VIDEO DIAGNOSTICS · LIVE</div>
+        {videoStats ? <>
+          <div>Element: <b>{videoStats.detected ? "DETECTED" : "NOT FOUND"}</b></div>
+          {videoStats.detected && <>
+            <div>readyState: <b>{videoStats.readyState}</b> (0–4)</div>
+            <div>Status: <b>{videoStats.paused ? "PAUSED" : "PLAYING"}</b></div>
+            <div>currentTime: <b>{videoStats.currentTime.toFixed(2)}s</b></div>
+            <div>Video: <b>{videoStats.videoWidth} × {videoStats.videoHeight}</b></div>
+            <div>Rendered: <b>{videoStats.renderedWidth} × {videoStats.renderedHeight}px</b></div>
+            <div>Error: <b>{videoStats.errorCode || "None"}</b></div>
+            <div style={{ overflowWrap: "anywhere", color: videoStats.errorCode ? "#ff9a9a" : "#c8c2c5" }}>{videoStats.errorMessage}</div>
+            <div style={{ marginTop: 4, color: "#aaa2a7" }}>Last event: {videoStats.event}</div>
+          </>}
+        </> : <div>Reading video element…</div>}
+      </aside>}
       <div className="arrival-orbit orbit-one" /><div className="arrival-orbit orbit-two" />
       <div className="arrival-coordinate">07°48' N&nbsp;&nbsp; 06°44' E <i /> LOKOJA, NIGERIA</div>
       <div className="arrival-copy">
