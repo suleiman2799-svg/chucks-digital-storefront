@@ -24,7 +24,7 @@
     100%{opacity:1;transform:translateX(0) scale(1) rotate(0)}
   }
   @keyframes chucks-c-assemble{
-    0%{opacity:.35;transform:translate(-520px,-28px) rotate(-9deg)}
+    0%{opacity:.35;transform:translate(-330px,-28px) rotate(-9deg)}
     18%{opacity:1}
     68%{transform:translate(18px,0) rotate(1.5deg)}
     86%{transform:translate(-5px,0) rotate(-.4deg)}
@@ -38,7 +38,7 @@
     100%{opacity:1;transform:translate(0,0) rotate(0)}
   }
   @keyframes chucks-m-assemble{
-    0%{opacity:0;transform:translate(380px,420px) scale(.72) rotate(8deg)}
+    0%{opacity:0;transform:translate(320px,300px) scale(.72) rotate(8deg)}
     22%{opacity:1}
     72%{transform:translate(-12px,-8px) scale(1.035) rotate(-1deg)}
     90%{transform:translate(3px,2px) scale(.995) rotate(.2deg)}
