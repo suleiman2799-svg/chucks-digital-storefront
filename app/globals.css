@@ -241,3 +241,15 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
  .bag-empty h3{font-size:49px}
 }
 @media(prefers-reduced-motion:reduce){.bag-layer,.bag-backdrop,.bag-drawer,.bag-close{transition:none!important}}
+
+
+.checkout-preview{min-height:100svh;padding:35px 20px;display:grid;place-items:center;background:radial-gradient(circle at 50% 25%,#f3dce8 0,transparent 38%),var(--paper)}
+.checkout-preview-card{width:min(520px,100%);padding:58px 42px;text-align:center;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 70px #25272b10}
+.checkout-preview-kicker{font-size:8px;font-weight:800;letter-spacing:.17em;color:#978c86}
+.checkout-preview-mark{width:62px;height:62px;border-radius:50%;margin:32px auto 23px;background:#f6e6ef;color:var(--pink);display:grid;place-items:center;font-size:27px}
+.checkout-preview h1{font:800 clamp(54px,9vw,76px)/.85 var(--display);letter-spacing:-.08em;margin:0 0 20px}
+.checkout-preview h1 em{font-style:normal;color:var(--pink)}
+.checkout-preview p{max-width:365px;margin:0 auto 27px;font-size:11px;line-height:1.9;color:#827973}
+.checkout-preview .button{height:50px;padding:0 21px}
+.checkout-preview-card>small{display:block;margin-top:35px;font-size:7px;letter-spacing:.14em;color:#a39a94}
+@media(max-width:500px){.checkout-preview-card{padding:42px 24px}.checkout-preview h1{font-size:57px}}
