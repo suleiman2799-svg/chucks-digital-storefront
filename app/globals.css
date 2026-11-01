@@ -253,3 +253,15 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 .checkout-preview .button{height:50px;padding:0 21px}
 .checkout-preview-card>small{display:block;margin-top:35px;font-size:7px;letter-spacing:.14em;color:#a39a94}
 @media(max-width:500px){.checkout-preview-card{padding:42px 24px}.checkout-preview h1{font-size:57px}}
+
+/* Product photography: Next Image handles responsive on-demand optimisation. */
+.product-visual{isolation:isolate}
+.product-visual .product-photo{object-fit:cover;object-position:center}
+.stage-product{overflow:hidden;border-radius:12px}
+.stage-product .product-photo{object-fit:contain;object-position:center}
+.bag-item-visual{position:relative}
+.bag-item-visual .product-photo{object-fit:cover;object-position:center}
+@media(max-width:700px){
+  .product-visual .product-photo{object-fit:cover}
+  .stage-product .product-photo{object-fit:contain}
+}
