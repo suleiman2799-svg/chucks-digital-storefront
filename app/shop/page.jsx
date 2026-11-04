@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import {useEffect,useMemo,useRef,useState} from "react";
+import CursorBuildMotion from "../components/CursorBuildMotion";
 
 const departments=[
 {name:"Fashion",note:"Find your everyday look",tone:"fashion",symbol:"✳"},
@@ -34,6 +35,7 @@ const changeQuantity=(id,delta)=>setBag(items=>items.map(item=>item.id===id?{...
 const removeItem=id=>setBag(items=>items.filter(item=>item.id!==id));
 useEffect(()=>{if(!bagOpen)return;const previousOverflow=document.body.style.overflow;document.body.style.overflow="hidden";bagCloseRef.current?.focus();const onKeyDown=event=>{if(event.key==="Escape"){setBagOpen(false);return}if(event.key==="Tab"){const focusable=bagCloseRef.current?.closest(".bag-drawer")?.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])');if(!focusable?.length)return;const first=focusable[0],last=focusable[focusable.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}};window.addEventListener("keydown",onKeyDown);return()=>{document.body.style.overflow=previousOverflow;window.removeEventListener("keydown",onKeyDown);bagTriggerRef.current?.focus()};},[bagOpen]);
 return <main>
+<CursorBuildMotion />
 <div className="announcement"><i/> A FRESH WAY TO SHOP IS TAKING SHAPE <span>/</span> LOKOJA, NIGERIA</div>
 <header className="header"><a className="brand" href="#home"><img className="brand-mark" src="/assets/chucks-logo.png" alt="" aria-hidden="true"/><strong>chucks<small>SHOPPING MALL</small></strong></a><nav><a className="active" href="#home">Home</a><a href="#departments">Departments</a><a href="#picks">Our picks</a><a href="#visit">Visit us</a></nav><div className="actions"><button className="icon" onClick={()=>setSearch(!search)} aria-label="Search"><Icon name="search"/></button><button className="icon wishlist-trigger" onClick={()=>{setDepartment("All");setQuery("");setShowWishlist(value=>!value);document.getElementById("picks")?.scrollIntoView({behavior:"smooth"});}} aria-label={(showWishlist?"Show all products":"View wishlist")+" ("+wishlist.length+" saved)"}><Icon name="heart"/>{wishlist.length>0&&<span>{wishlist.length}</span>}</button><button className="bag" onClick={openBag} aria-label={`Open shopping bag, ${bagCount} items`} aria-haspopup="dialog" aria-expanded={bagOpen}><Icon name="bag"/> Bag <b>{bagCount}</b></button></div></header>
 {search&&<div className="search-panel"><Icon name="search"/><input autoFocus placeholder="What are you looking for?" value={query} onChange={e=>setQuery(e.target.value)}/><button onClick={()=>{setSearch(false);setQuery("")}}>Close</button></div>}
