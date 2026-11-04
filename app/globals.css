@@ -466,3 +466,7 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 @media(max-width:650px){
   .cursorbuild-wireframe-detail{stroke-dasharray:2 6}
 }
+
+/* After the complete landing-page build, the entire cursor team exits together. */
+.cursorbuild-pointer-layer.cursorbuild-team-finished .cursorbuild-cursor,
+.cursorbuild-pointer-layer.cursorbuild-team-finished .cursorbuild-motion-trail{opacity:0!important;visibility:hidden!important;transition:opacity 400ms ease,visibility 400ms ease!important;}
