@@ -7,11 +7,11 @@ import { CursorRenderer } from "../../lib/cursorbuild/cursor-renderer";
 
 const EASE = "power3.out";
 const TIMING = {
-  glide: 0.3,
-  draw: 0.4,
-  wireframeHold: 0.25,
-  contentReveal: 0.3,
-  guideFade: 0.25
+  glide: 0.18,
+  draw: 0.26,
+  wireframeHold: 0.1,
+  contentReveal: 0.18,
+  guideFade: 0.14
 };
 const TEAM = [
   ["designer", "#c83a8f"],
@@ -49,7 +49,7 @@ export default function CursorBuildPointers() {
     if (!host) return undefined;
 
     const mobile = window.matchMedia("(max-width: 600px)").matches;
-    const cursorCount = 16;
+    const cursorCount = 7;
     const team = TEAM.slice(0, cursorCount);
     const manager = new CursorManager();
     team.forEach(([name, color], index) => manager.add({
@@ -68,10 +68,10 @@ export default function CursorBuildPointers() {
     });
 
     const renderer = new CursorRenderer(manager, host, {
-      maxVisible: 16,
-      tabletMaxVisible: 16,
-      mobileMaxVisible: 16,
-      touchMaxVisible: 16,
+      maxVisible: 7,
+      tabletMaxVisible: 7,
+      mobileMaxVisible: 7,
+      touchMaxVisible: 7,
       duration: TIMING.glide,
       ease: EASE,
       naturalMovement: { duration: TIMING.glide, ease: EASE, curvature: 0.1 },
@@ -91,10 +91,9 @@ export default function CursorBuildPointers() {
     });
 
     const guides = new Set();
-    const queues = team.map(() => []);
+    const pendingTargets = [];
     const busy = team.map(() => false);
     const queuedTargets = new WeakSet();
-    let assignmentIndex = 0;
     let alive = true;
     let trailFrame = 0;
     let sectionActive = false;
@@ -243,7 +242,7 @@ export default function CursorBuildPointers() {
 
     const pump = async (cursorIndex) => {
       if (busy[cursorIndex] || !alive) return;
-      const next = queues[cursorIndex].shift();
+      const next = pendingTargets.shift();
       if (!next) return;
       busy[cursorIndex] = true;
       try {
@@ -257,7 +256,7 @@ export default function CursorBuildPointers() {
         notifyComplete(next);
       }
       busy[cursorIndex] = false;
-      if (alive && queues[cursorIndex].length) pump(cursorIndex);
+      if (alive && pendingTargets.length) pump(cursorIndex);
     };
 
     const onSectionStart = () => {
@@ -281,9 +280,12 @@ export default function CursorBuildPointers() {
       const target = event.detail?.target;
       if (!(target instanceof HTMLElement) || !target.isConnected || queuedTargets.has(target)) return;
       queuedTargets.add(target);
-      const cursorIndex = assignmentIndex++ % team.length;
-      queues[cursorIndex].push(target);
-      pump(cursorIndex);
+      pendingTargets.push(target);
+      // All seven workers share one ordered queue and take the next task
+      // as soon as they finish their current element.
+      busy.forEach((isBusy, cursorIndex) => {
+        if (!isBusy) pump(cursorIndex);
+      });
     };
 
     window.addEventListener("cursorbuild:construct", onConstruct);
