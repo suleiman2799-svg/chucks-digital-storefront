@@ -18,7 +18,11 @@ const TIMING = {
 
 const waitForTimeline = (timeline) => new Promise((resolve) => {
   if (!timeline) return resolve();
-  timeline.eventCallback("onComplete", resolve);
+  const previous = timeline.eventCallback("onComplete");
+  timeline.eventCallback("onComplete", (...args) => {
+    if (typeof previous === "function") previous.apply(timeline, args);
+    resolve();
+  });
 });
 
 const pauseFor = (seconds) => new Promise((resolve) => {
