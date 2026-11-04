@@ -25,11 +25,6 @@ const waitForTimeline = (timeline) => new Promise((resolve) => {
   });
 });
 
-const pauseFor = (seconds) => new Promise((resolve) => {
-  const tween = gsap.delayedCall(seconds, resolve);
-  return () => tween.kill();
-};
-
 export default function CursorBuildPointers() {
   const hostRef = useRef(null);
 
