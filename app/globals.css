@@ -420,3 +420,49 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 @media(prefers-reduced-motion:reduce){
   .cursorbuild-motion-trail{transition:none}
 }
+
+
+/* Multi-designer team: preserve the existing 25x30 cursor geometry. */
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor{
+  display:flex!important;opacity:1!important;visibility:visible!important;
+  z-index:5!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.92)) drop-shadow(0 0 5px rgba(255,255,255,.42))!important;
+  will-change:transform;
+}
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor__pointer,
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor__pointer svg{
+  width:25px!important;height:30px!important;flex:none!important;
+}
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor__shape{
+  fill:#fff!important;stroke:#111!important;stroke-width:1.8!important;
+  stroke-linejoin:round!important;paint-order:stroke fill!important;
+}
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor__label{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  color:#fff!important;font:700 9px/1.1 Inter,ui-sans-serif,system-ui,sans-serif!important;
+  letter-spacing:.02em!important;margin:9px 0 0 3px!important;padding:4px 7px!important;
+  border:1px solid rgba(0,0,0,.55)!important;border-radius:4px!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.4)!important;box-shadow:0 2px 8px rgba(0,0,0,.3)!important;
+  white-space:nowrap!important;
+}
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor__halo{
+  display:none!important;
+}
+.cursorbuild-motion-trail{
+  position:absolute;left:0;top:0;width:7px;height:7px;border-radius:50%;
+  background:rgba(255,255,255,.92);border:1px solid rgba(17,17,17,.78);
+  box-shadow:0 0 7px rgba(255,255,255,.62),0 1px 3px rgba(0,0,0,.45);
+  pointer-events:none;z-index:3;opacity:.16;will-change:transform,opacity;
+  transition:transform 120ms ease-out,opacity 120ms ease-out;
+}
+.cursorbuild-wireframe{
+  position:fixed;display:block;overflow:visible;pointer-events:none;z-index:2;
+  opacity:1;will-change:opacity;shape-rendering:geometricPrecision;
+}
+.cursorbuild-wireframe-outline,.cursorbuild-wireframe-detail{
+  vector-effect:non-scaling-stroke;
+}
+.cursorbuild-wireframe-outline{stroke:var(--cursorbuild-guide-color)!important}
+.cursorbuild-wireframe-detail{stroke:var(--cursorbuild-guide-color)!important}
+@media(max-width:650px){
+  .cursorbuild-wireframe-detail{stroke-dasharray:2 6}
+}
