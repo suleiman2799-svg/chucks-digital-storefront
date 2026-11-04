@@ -9,17 +9,15 @@ export default function CursorBuildMotion() {
       respectReducedMotion: true,
       defaults: { duration: 0.85, ease: "power3.out" }
     });
-    const cleanups = [];
-
     const animate = (selector, options = {}) => {
       const elements = document.querySelectorAll(selector);
       if (!elements.length) return;
-      cleanups.push(engine.stagger(Array.from(elements), {
+      engine.stagger(Array.from(elements), {
         from: { opacity: 0, y: 28 },
         to: { opacity: 1, y: 0 },
         duration: options.duration ?? 0.8,
         stagger: options.stagger ?? 0.12
-      }));
+      });
     };
 
     // Keep content visible if the browser has reduced motion enabled.
