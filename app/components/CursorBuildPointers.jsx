@@ -49,7 +49,7 @@ export default function CursorBuildPointers() {
     if (!host) return undefined;
 
     const mobile = window.matchMedia("(max-width: 600px)").matches;
-    const cursorCount = mobile ? 12 : 16;
+    const cursorCount = 16;
     const team = TEAM.slice(0, cursorCount);
     const manager = new CursorManager();
     team.forEach(([name, color], index) => manager.add({
@@ -70,8 +70,8 @@ export default function CursorBuildPointers() {
     const renderer = new CursorRenderer(manager, host, {
       maxVisible: 16,
       tabletMaxVisible: 16,
-      mobileMaxVisible: 12,
-      touchMaxVisible: 12,
+      mobileMaxVisible: 16,
+      touchMaxVisible: 16,
       duration: TIMING.glide,
       ease: EASE,
       naturalMovement: { duration: TIMING.glide, ease: EASE, curvature: 0.1 },
