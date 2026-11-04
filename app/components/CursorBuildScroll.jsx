@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { gsap } from "gsap";
 import { ScrollConstructionEngine } from "../../lib/cursorbuild/scroll-construction-engine";
 
 const REVEAL_SELECTORS = [
@@ -64,6 +65,16 @@ export default function CursorBuildScroll() {
         const rect = element.getBoundingClientRect();
         const inOpeningViewport = rect.bottom > 0 && rect.top < window.innerHeight * 1.18;
         if (inOpeningViewport) {
+          // Opening-viewport elements must not be held at the hidden start
+          // state of a paused ScrollTrigger timeline. Make them visible first,
+          // then let the cursor perform the actual resize/build animation.
+          gsap.set(element, {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            clipPath: "inset(0 0% 0 0 round 0px)"
+          });
+          element.classList.remove("cursorbuild-unbuilt");
           const delay = initialOrder * 145;
           const timer = window.setTimeout(() => {
             timers.delete(timer);
@@ -71,6 +82,7 @@ export default function CursorBuildScroll() {
           }, delay);
           timers.add(timer);
           initialOrder += 1;
+          return;
         }
 
         const id = "cursorbuild-scene-" + (++sequence);
