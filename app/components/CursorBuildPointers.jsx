@@ -263,12 +263,14 @@ export default function CursorBuildPointers() {
     const onSectionStart = () => {
       sectionActive = true;
       host.classList.remove("cursorbuild-team-finished");
+      host.classList.add("cursorbuild-section-active");
       gsap.to([...cursorNodes, ...trails].filter(Boolean), {
         autoAlpha: 1, duration: 0.2, ease: "power2.out", overwrite: true
       });
     };
     const onSectionComplete = () => {
       sectionActive = false;
+      host.classList.remove("cursorbuild-section-active");
       host.classList.add("cursorbuild-team-finished");
       gsap.to([...cursorNodes, ...trails].filter(Boolean), {
         autoAlpha: 0, duration: 0.4, ease: "power2.out", overwrite: true
