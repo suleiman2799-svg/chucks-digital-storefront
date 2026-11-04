@@ -36,16 +36,19 @@ export default function CursorBuildPointers() {
         frame = 0;
         if (!latest) return;
         const point = latest;
-        renderer.moveTo("visitor", point, 0.12);
+        const bounds = hostRef.current.getBoundingClientRect();
+        renderer.moveTo("visitor", { x: point.x - bounds.left, y: point.y - bounds.top }, 0.12);
         renderer.moveTo("chucks-guide", {
-          x: Math.max(8, point.x - 30),
-          y: Math.max(8, point.y + 22)
+          x: Math.max(8, point.x - bounds.left - 30),
+          y: Math.max(8, point.y - bounds.top + 22)
         }, 0.48);
       });
     };
+
     let clickSequence = 0;
     const onPointerDown = (event) => {
-      const point = { x: event.clientX, y: event.clientY };
+      const bounds = hostRef.current.getBoundingClientRect();
+      const point = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
       renderer.moveTo("visitor", point, 0.08);
       renderer.moveTo("chucks-guide", { x: Math.max(8, point.x - 30), y: Math.max(8, point.y + 22) }, 0.18);
       const groupId = "pointer-click-" + (++clickSequence);
@@ -61,12 +64,43 @@ export default function CursorBuildPointers() {
       void group.run().catch(() => {}).finally(() => coordination.destroyGroup(groupId));
     };
 
+    // Scroll scenes request a coordinated cursor pass over each element as it enters view.
+    const onConstruct = (event) => {
+      const target = event.detail?.target;
+      if (!(target instanceof HTMLElement) || !target.isConnected) return;
+      const host = hostRef.current;
+      if (!host) return;
+      const hostRect = host.getBoundingClientRect();
+      const rect = target.getBoundingClientRect();
+      const centerX = rect.left - hostRect.left + rect.width / 2;
+      const centerY = rect.top - hostRect.top + Math.min(rect.height / 2, 90);
+      const visitorPoint = {
+        x: Math.max(8, Math.min(host.clientWidth - 28, centerX - 8)),
+        y: Math.max(8, Math.min(host.clientHeight - 38, centerY - 8))
+      };
+      const guidePoint = {
+        x: Math.max(8, Math.min(host.clientWidth - 28, centerX + 22)),
+        y: Math.max(8, Math.min(host.clientHeight - 38, centerY + 18))
+      };
+
+      const visitorMove = renderer.moveNaturally("visitor", visitorPoint, {
+        duration: 0.72, curvature: 0.22, ease: "power2.inOut"
+      });
+      const guideMove = renderer.moveNaturally("chucks-guide", guidePoint, {
+        duration: 0.92, curvature: 0.18, ease: "power2.inOut"
+      });
+      if (visitorMove) visitorMove.eventCallback("onComplete", () => renderer.click("visitor"));
+      if (guideMove) guideMove.eventCallback("onComplete", () => renderer.click("chucks-guide"));
+    };
+
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerdown", onPointerDown, { passive: true });
+    window.addEventListener("cursorbuild:construct", onConstruct);
 
     return () => {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("cursorbuild:construct", onConstruct);
       if (frame) window.cancelAnimationFrame(frame);
       coordination.destroy();
       renderer.destroy();
