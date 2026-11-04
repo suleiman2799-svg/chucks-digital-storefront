@@ -4,13 +4,13 @@ import { useEffect } from "react";
 import { ScrollConstructionEngine } from "../../lib/cursorbuild/scroll-construction-engine";
 
 const REVEAL_SELECTORS = [
-  // Brand chrome is also assembled rather than appearing fully formed.
+  // Start at the very top: brand identity and navigation are the first build.
   ".arrival-nav .arrival-brand",
   ".arrival-nav .arrival-nav-links",
   ".arrival-nav .arrival-nav-cta",
   ".arrival-coordinate",
   ".arrival-orbit",
-  // Landing hero: reveal the actual headline, copy and architectural details.
+  // The hero logo is deliberately first among the hero content.
   ".arrival-copy .arrival-logo-reveal",
   ".arrival-copy .arrival-kicker",
   ".arrival-copy h1",
@@ -40,14 +40,40 @@ export default function CursorBuildScroll() {
   useEffect(() => {
     const engine = new ScrollConstructionEngine();
     const scenes = [];
+    const dispatched = new WeakSet();
+    const timers = new Set();
     let sequence = 0;
+    let alive = true;
 
+    const dispatchConstruction = (element) => {
+      if (!alive || !(element instanceof HTMLElement) || !element.isConnected || dispatched.has(element)) return;
+      dispatched.add(element);
+      const id = "cursorbuild-scene-" + (++sequence);
+      window.dispatchEvent(new CustomEvent("cursorbuild:construct", {
+        detail: { id, target: element }
+      }));
+    };
+
+    // Build everything already visible on first paint instead of waiting for
+    // ScrollTrigger to receive a scroll event. This makes the opening logo,
+    // navigation and hero composition come alive immediately at scrollY = 0.
+    let initialOrder = 0;
     REVEAL_SELECTORS.forEach((selector) => {
       document.querySelectorAll(selector).forEach((element) => {
-        // Establish the hidden state before ScrollTrigger measures the page.
         element.classList.add("cursorbuild-unbuilt");
+        const rect = element.getBoundingClientRect();
+        const inOpeningViewport = rect.bottom > 0 && rect.top < window.innerHeight * 1.18;
+        if (inOpeningViewport) {
+          const delay = initialOrder * 145;
+          const timer = window.setTimeout(() => {
+            timers.delete(timer);
+            dispatchConstruction(element);
+          }, delay);
+          timers.add(timer);
+          initialOrder += 1;
+        }
+
         const id = "cursorbuild-scene-" + (++sequence);
-        let dispatched = false;
         const scene = engine.createScene(id, {
           trigger: element,
           start: "top 88%",
@@ -55,12 +81,7 @@ export default function CursorBuildScroll() {
           reverse: false,
           respectReducedMotion: true,
           onProgress: (progress) => {
-            if (progress > 0.015 && !dispatched) {
-              dispatched = true;
-              window.dispatchEvent(new CustomEvent("cursorbuild:construct", {
-                detail: { id, target: element }
-              }));
-            }
+            if (progress > 0.015) dispatchConstruction(element);
           }
         }, (timeline) => {
           timeline.fromTo(element,
@@ -88,10 +109,13 @@ export default function CursorBuildScroll() {
     const refresh = window.requestAnimationFrame(() => engine.refresh());
     const refreshAfterLayout = window.setTimeout(() => engine.refresh(), 500);
     const refreshAfterFonts = document.fonts?.ready?.then(() => {
-      if (document.visibilityState !== "hidden") engine.refresh();
+      if (alive && document.visibilityState !== "hidden") engine.refresh();
     });
 
     return () => {
+      alive = false;
+      timers.forEach((timer) => window.clearTimeout(timer));
+      timers.clear();
       window.cancelAnimationFrame(refresh);
       window.clearTimeout(refreshAfterLayout);
       scenes.forEach((scene) => scene.destroy());
