@@ -20,3 +20,5 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Build production website
         run: npm run build
+
+# Build validation for the isolated CursorBuild integration branch.
