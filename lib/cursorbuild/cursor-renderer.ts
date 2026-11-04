@@ -60,6 +60,8 @@ export interface CursorRendererOptions {
   /** Maximum visible cursors when a coarse/touch pointer is available. */
   touchMaxVisible?: number;
   respectReducedMotion?: boolean;
+  /** Allow resize simulations to target live page elements outside the cursor overlay container. */
+  allowExternalResizeTargets?: boolean;
   initialPositions?: Record<string, CursorPoint>;
   naturalMovement?: NaturalMovementOptions;
   clickFeedback?: CursorClickFeedbackOptions;
@@ -134,6 +136,7 @@ export class CursorRenderer {
   private readonly unsubscribe: () => void;
   private readonly options: Required<Omit<CursorRendererOptions, "initialPositions" | "naturalMovement" | "clickFeedback">>;
   private readonly initialPositions: Record<string, CursorPoint>;
+  private readonly allowExternalResizeTargets: boolean;
   private readonly clickOptions: Required<CursorClickFeedbackOptions>;
   private readonly originalPosition: string;
   private readonly changedContainerPosition: boolean;
@@ -159,6 +162,7 @@ export class CursorRenderer {
     this.clickOptions = { ...CLICK_DEFAULTS, ...options.clickFeedback };
     this.validateClickOptions(this.clickOptions);
     this.initialPositions = options.initialPositions ?? {};
+    this.allowExternalResizeTargets = options.allowExternalResizeTargets ?? false;
     this.mediaQuery = typeof window.matchMedia === "function" ? window.matchMedia("(prefers-reduced-motion: reduce)") : undefined;
     this.pointerQuery = typeof window.matchMedia === "function" ? window.matchMedia("(pointer: coarse)") : undefined;
     this.visualViewport = window.visualViewport ?? undefined;
@@ -539,7 +543,7 @@ export class CursorRenderer {
     if (!Number.isFinite(curvature) || curvature < 0 || curvature > 1) throw new RangeError("Resize curvature must be between 0 and 1.");
     if (!RESIZE_HANDLES.includes(handle)) throw new TypeError("Unknown resize handle.");
     const element = typeof options.target === "string" ? this.resolveResizeSelector(options.target) : options.target;
-    if (!(element instanceof HTMLElement) || element === this.container || !this.container.contains(element)) throw new Error("Resize target must be an HTMLElement contained by the mounted container.");
+    if (!(element instanceof HTMLElement) || element === this.container || !element.isConnected || (!this.allowExternalResizeTargets && !this.container.contains(element))) throw new Error("Resize target must be a connected HTMLElement; external targets require allowExternalResizeTargets.");
     const dragOwner = this.dragLocks.get(element);
     if (dragOwner && dragOwner !== id) throw new Error("Target is already being dragged by cursor: " + dragOwner);
     const textOwner = this.textLocks.get(element);
@@ -551,8 +555,11 @@ export class CursorRenderer {
     this.clickTimelines.get(id)?.kill(); this.clickTimelines.delete(id);
 
     const rect = element.getBoundingClientRect(), containerRect = this.container.getBoundingClientRect();
-    const ox = containerRect.left + this.container.clientLeft - this.container.scrollLeft;
-    const oy = containerRect.top + this.container.clientTop - this.container.scrollTop;
+    // The pointer layer is fixed to the viewport. External page targets therefore
+    // use viewport coordinates rather than the overlay container scroll origin.
+    const externalTarget = !this.container.contains(element);
+    const ox = externalTarget ? containerRect.left : containerRect.left + this.container.clientLeft - this.container.scrollLeft;
+    const oy = externalTarget ? containerRect.top : containerRect.top + this.container.clientTop - this.container.scrollTop;
     const computed = window.getComputedStyle(element);
     const extraW = (parseFloat(computed.paddingLeft)||0)+(parseFloat(computed.paddingRight)||0)+(parseFloat(computed.borderLeftWidth)||0)+(parseFloat(computed.borderRightWidth)||0);
     const extraH = (parseFloat(computed.paddingTop)||0)+(parseFloat(computed.paddingBottom)||0)+(parseFloat(computed.borderTopWidth)||0)+(parseFloat(computed.borderBottomWidth)||0);
@@ -665,7 +672,7 @@ export class CursorRenderer {
     });
     this.overlay.appendChild(frame);
     const updateFrame=()=>{
-      if(!element.isConnected || !this.container.contains(element))return;
+      if(!element.isConnected || (!this.allowExternalResizeTargets && !this.container.contains(element)))return;
       const r=element.getBoundingClientRect();
       Object.assign(frame.style,{left:(r.left-ox)+"px",top:(r.top-oy)+"px",width:r.width+"px",height:r.height+"px"});
     };
@@ -683,7 +690,7 @@ export class CursorRenderer {
     const record:ResizeRecord={element,timeline,frame,originalWidth,originalHeight,originalTranslate,cssTargetWidth:cssW,cssTargetHeight:cssH,cssTargetTranslate,handle};
     this.resizeLocks.set(element,id);this.activeResizes.set(id,record);
     const removed=()=>{
-      if(!element.isConnected || !this.container.contains(element)){this.cancelResizeRecord(id,record);return true;}
+      if(!element.isConnected || (!this.allowExternalResizeTargets && !this.container.contains(element))){this.cancelResizeRecord(id,record);return true;}
       return false;
     };
     if(this.reducedMotion || duration===0){
@@ -726,18 +733,18 @@ export class CursorRenderer {
   }
   isResizing(id:string):boolean{
     const record=this.activeResizes.get(id);
-    if(record && (!record.element.isConnected || !this.container.contains(record.element)))this.cancelResizeRecord(id,record);
+    if(record && (!record.element.isConnected || (!this.allowExternalResizeTargets && !this.container.contains(record.element))))this.cancelResizeRecord(id,record);
     return this.activeResizes.has(id);
   }
   private resolveResizeSelector(selector:string):HTMLElement{
     let element:Element|null;
-    try{element=this.container.querySelector(selector);}catch{throw new TypeError("Resize target must be a valid CSS selector.");}
-    if(!(element instanceof HTMLElement))throw new Error("Resize selector did not match an HTMLElement inside the mounted container.");
+    try{element=this.allowExternalResizeTargets ? document.querySelector(selector) : this.container.querySelector(selector);}catch{throw new TypeError("Resize target must be a valid CSS selector.");}
+    if(!(element instanceof HTMLElement))throw new Error("Resize selector did not match a connected HTMLElement.");
     return element;
   }
   private cancelRemovedResizes():void{
     [...this.activeResizes.entries()].forEach(([id,record])=>{
-      if(!record.element.isConnected || !this.container.contains(record.element))this.cancelResizeRecord(id,record);
+      if(!record.element.isConnected || (!this.allowExternalResizeTargets && !this.container.contains(record.element)))this.cancelResizeRecord(id,record);
     });
   }
   private cancelResizeRecord(id:string,record:ResizeRecord):void{
