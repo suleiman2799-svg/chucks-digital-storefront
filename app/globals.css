@@ -470,3 +470,8 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 /* After the complete landing-page build, the entire cursor team exits together. */
 .cursorbuild-pointer-layer.cursorbuild-team-finished .cursorbuild-cursor,
 .cursorbuild-pointer-layer.cursorbuild-team-finished .cursorbuild-motion-trail{opacity:0!important;visibility:hidden!important;transition:opacity 400ms ease,visibility 400ms ease!important;}
+
+/* Cursor team is hidden between sections and visible only during that section's build. */
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor{opacity:0!important;visibility:hidden!important;transition:opacity 400ms ease,visibility 400ms ease!important;}
+.cursorbuild-pointer-layer.cursorbuild-landing-only.cursorbuild-section-active .cursorbuild-cursor{opacity:1!important;visibility:visible!important;}
+.cursorbuild-pointer-layer.cursorbuild-team-finished .cursorbuild-motion-trail{opacity:0!important;visibility:hidden!important;}
