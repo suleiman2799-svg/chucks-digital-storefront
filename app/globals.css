@@ -356,3 +356,11 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 .cursorbuild-pointer-layer .cursorbuild-cursor__label { display: none !important; }
 .cursorbuild-pointer-layer .cursorbuild-cursor__shape { fill: #000 !important; }
 .cursorbuild-pointer-layer .cursorbuild-resize-frame { border-color: rgba(0,0,0,.55) !important; }
+
+/* Landing-only construction cursors: black, unlabeled, hidden until assigned work. */
+.cursorbuild-pointer-layer.cursorbuild-landing-only{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;z-index:9999!important;pointer-events:none!important;overflow:hidden!important}
+.cursorbuild-landing-only .cursorbuild-cursor{opacity:0;visibility:hidden;transition:opacity 160ms ease!important;z-index:2!important}
+.cursorbuild-landing-only .cursorbuild-cursor__label{display:none!important}
+.cursorbuild-landing-only .cursorbuild-cursor__shape{fill:#000!important;stroke:#000!important}
+.cursorbuild-landing-only .cursorbuild-resize-frame{border-color:#111!important;outline-color:rgba(0,0,0,.2)!important;box-shadow:0 0 0 1px rgba(255,255,255,.28)!important}
+.cursorbuild-landing-only .cursorbuild-resize-handle{background:#111!important;border-color:#fff!important}
