@@ -59,12 +59,6 @@ export default function CursorBuildScroll() {
     const demoMode = new URLSearchParams(window.location.search).get("cursorbuild") === "demo";
     let observer;
     let demoLocked = false;
-    const completedTargets = new Set();
-    const markComplete = (event) => {
-      if (elements.includes(event.detail?.target)) completedTargets.add(event.detail.target);
-      if (completedTargets.size === elements.length) window.dispatchEvent(new CustomEvent("cursorbuild:all-complete"));
-    };
-    window.addEventListener("cursorbuild:complete", markComplete);
     const blockDemoScroll = (event) => {
       if (demoLocked) event.preventDefault();
     };
@@ -89,6 +83,7 @@ export default function CursorBuildScroll() {
       window.requestAnimationFrame(check);
     });
     const waitForBuildGroup = (group) => new Promise((resolve) => {
+      window.dispatchEvent(new CustomEvent("cursorbuild:section-start"));
       let remaining = group.length;
       if (!remaining) return resolve();
       const completed = new Set();
@@ -99,6 +94,7 @@ export default function CursorBuildScroll() {
         remaining -= 1;
         if (remaining <= 0) {
           window.removeEventListener("cursorbuild:complete", onComplete);
+          window.dispatchEvent(new CustomEvent("cursorbuild:section-complete"));
           resolve();
         }
       };
@@ -128,27 +124,33 @@ export default function CursorBuildScroll() {
         }
       });
     } else if ("IntersectionObserver" in window) {
+      const groups = new Map();
+      elements.forEach((element) => {
+        const section = element.closest("header, section, footer") || document.body;
+        if (!groups.has(section)) groups.set(section, []);
+        groups.get(section).push(element);
+      });
       observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
           observer.unobserve(entry.target);
-          window.dispatchEvent(new CustomEvent("cursorbuild:construct", {
-            detail: { target: entry.target }
-          }));
+          const group = groups.get(entry.target) || [];
+          waitForBuildGroup(group);
         });
       }, { root: null, rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
-      elements.forEach((element) => observer.observe(element));
+      groups.forEach((_, section) => observer.observe(section));
     } else {
+      const groups = new Map();
       elements.forEach((element) => {
-        window.dispatchEvent(new CustomEvent("cursorbuild:construct", {
-          detail: { target: element }
-        }));
+        const section = element.closest("header, section, footer") || document.body;
+        if (!groups.has(section)) groups.set(section, []);
+        groups.get(section).push(element);
       });
+      groups.forEach((group) => waitForBuildGroup(group));
     }
 
     return () => {
       observer?.disconnect();
-      window.removeEventListener("cursorbuild:complete", markComplete);
       window.removeEventListener("wheel", blockDemoScroll);
       window.removeEventListener("touchmove", blockDemoScroll);
       window.removeEventListener("keydown", blockDemoKeys);
