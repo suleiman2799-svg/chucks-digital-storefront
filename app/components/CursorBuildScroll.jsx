@@ -4,6 +4,12 @@ import { useEffect } from "react";
 import { ScrollConstructionEngine } from "../../lib/cursorbuild/scroll-construction-engine";
 
 const REVEAL_SELECTORS = [
+  // Brand chrome is also assembled rather than appearing fully formed.
+  ".arrival-nav .arrival-brand",
+  ".arrival-nav .arrival-nav-links",
+  ".arrival-nav .arrival-nav-cta",
+  ".arrival-coordinate",
+  ".arrival-orbit",
   // Landing hero: reveal the actual headline, copy and architectural details.
   ".arrival-copy .arrival-logo-reveal",
   ".arrival-copy .arrival-kicker",
