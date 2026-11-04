@@ -4,7 +4,11 @@ import { useEffect } from "react";
 import { ScrollConstructionEngine } from "../../lib/cursorbuild/scroll-construction-engine";
 
 const REVEAL_SELECTORS = [
-  // Cinematic landing page — these are the elements visitors actually scroll through.
+  // Cinematic landing page — include the hero build as well as every later section.
+  ".arrival-hero .arrival-copy",
+  ".arrival-hero .architecture",
+  ".arrival-hero .marker-a",
+  ".arrival-hero .marker-b",
   ".arrival-intro .intro-content",
   ".arrival-intro .intro-stamp",
   ".arrival-wings .wings-heading",
