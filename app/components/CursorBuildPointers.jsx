@@ -1,184 +1,224 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import { CursorManager } from "../../lib/cursorbuild/cursor-manager";
 import { CursorRenderer } from "../../lib/cursorbuild/cursor-renderer";
 
-const AGENTS = [
-  ["architect", "", "#000000"],
-  ["builder", "", "#000000"],
-  ["designer", "", "#000000"],
-  ["stylist", "", "#000000"],
-  ["maker", "", "#000000"],
-  ["finisher", "", "#000000"],
-  ["curator", "", "#000000"],
-  ["detailer", "", "#000000"],
-  ["sculptor", "", "#000000"],
-  ["navigator", "", "#000000"],
-  ["composer", "", "#000000"],
-  ["polisher", "", "#000000"]
-];
+const CURSOR_ID = "designer";
+const EASE = "power3.out";
+const TIMING = {
+  glide: 0.3,
+  draw: 0.6,
+  wireframeHold: 0.4,
+  revealPause: 0.15,
+  contentReveal: 0.4,
+  guideFade: 0.3
+};
+
+const waitForTimeline = (timeline) => new Promise((resolve) => {
+  if (!timeline) return resolve();
+  timeline.eventCallback("onComplete", resolve);
+});
+
+const pauseFor = (seconds) => new Promise((resolve) => {
+  const tween = gsap.delayedCall(seconds, resolve);
+  return () => tween.kill();
+};
 
 export default function CursorBuildPointers() {
   const hostRef = useRef(null);
 
   useEffect(() => {
     const host = hostRef.current;
-    if (!host) return;
+    if (!host) return undefined;
 
     const manager = new CursorManager();
-    AGENTS.forEach(([id, name, color]) => manager.add({ id, name, color }));
+    manager.add({ id: CURSOR_ID, name: "designer", color: "#ffffff" });
+
     const renderer = new CursorRenderer(manager, host, {
-      maxVisible: 12,
-      tabletMaxVisible: 12,
-      mobileMaxVisible: 12,
-      touchMaxVisible: 12,
-      allowExternalResizeTargets: true,
-      duration: 0.55,
-      ease: "power3.inOut",
-      respectReducedMotion: true,
-      clickFeedback: { style: "ripple-press", duration: 0.34, intensity: 0.7 }
+      maxVisible: 1,
+      tabletMaxVisible: 1,
+      mobileMaxVisible: 1,
+      touchMaxVisible: 1,
+      duration: TIMING.glide,
+      ease: EASE,
+      naturalMovement: { duration: TIMING.glide, ease: EASE, curvature: 0.12 },
+      initialPositions: { [CURSOR_ID]: { x: 24, y: 24 } },
+      respectReducedMotion: false,
+      clickFeedback: { style: "ripple-press", duration: 0.28, intensity: 0.5 }
     });
 
-    host.querySelectorAll(".cursorbuild-cursor").forEach((node) => {
-      node.style.opacity = "0";
-      node.style.visibility = "hidden";
-      node.style.transition = "opacity 160ms ease";
-    });
+    const cursorNode = host.querySelector(`.cursorbuild-cursor[data-cursor-id="${CURSOR_ID}"]`);
+    const trail = document.createElement("span");
+    trail.className = "cursorbuild-motion-trail";
+    host.appendChild(trail);
 
+    const guides = new Set();
     const queue = [];
-    const busy = new Set();
-    let nextAgent = 0;
+    const queued = new WeakSet();
+    let active = false;
     let alive = true;
-    const timers = new Set();
-    const later = (fn, ms) => {
-      const timer = window.setTimeout(() => {
-        timers.delete(timer);
-        if (alive) fn();
-      }, ms);
-      timers.add(timer);
-      return timer;
-    };
+    let trailFrame = 0;
 
-    const pointFor = (rect, handle, bounds) => ({
-      x: Math.max(10, Math.min(window.innerWidth - 30, rect.left + rect.width * handle.x - bounds.left)),
-      y: Math.max(10, Math.min(window.innerHeight - 38, rect.top + rect.height * handle.y - bounds.top))
+    const updateTrail = () => {
+      if (!alive) return;
+      if (cursorNode) {
+        const x = Number(gsap.getProperty(cursorNode, "x")) || 0;
+        const y = Number(gsap.getProperty(cursorNode, "y")) || 0;
+        trail.style.transform = `translate3d(${x + 7}px,${y + 13}px,0)`;
+        trail.style.opacity = active ? "0.34" : "0.16";
+      }
+      trailFrame = window.requestAnimationFrame(updateTrail);
+    };
+    trailFrame = window.requestAnimationFrame(updateTrail);
+
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const cursorPoint = (x, y) => ({
+      x: clamp(x, 8, Math.max(8, window.innerWidth - 32)),
+      y: clamp(y, 8, Math.max(8, window.innerHeight - 38))
     });
 
-    const pump = () => {
-      if (!alive || !queue.length) return;
-      while (queue.length && busy.size < 6) {
-        let agent = null;
-        for (let i = 0; i < AGENTS.length; i++) {
-          const candidate = AGENTS[(nextAgent + i) % AGENTS.length][0];
-          if (!busy.has(candidate)) {
-            agent = candidate;
-            nextAgent = (nextAgent + i + 1) % AGENTS.length;
-            break;
-          }
-        }
-        if (!agent) return;
-        const target = queue.shift();
-        if (!(target instanceof HTMLElement) || !target.isConnected) continue;
-        busy.add(agent);
-        construct(agent, target);
-      }
+    const makeGuide = (rect) => {
+      const width = Math.max(12, rect.width);
+      const height = Math.max(12, rect.height);
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.setAttribute("width", String(width));
+      svg.setAttribute("height", String(height));
+      svg.classList.add("cursorbuild-wireframe");
+      svg.style.left = `${rect.left}px`;
+      svg.style.top = `${rect.top}px`;
+      svg.style.width = `${width}px`;
+      svg.style.height = `${height}px`;
+
+      const perimeter = Math.max(1, 2 * (width + height));
+      const outline = document.createElementNS(svg.namespaceURI, "rect");
+      outline.setAttribute("x", "1");
+      outline.setAttribute("y", "1");
+      outline.setAttribute("width", String(Math.max(1, width - 2)));
+      outline.setAttribute("height", String(Math.max(1, height - 2)));
+      outline.setAttribute("rx", "2");
+      outline.setAttribute("fill", "none");
+      outline.setAttribute("stroke", "#c83a8f");
+      outline.setAttribute("stroke-width", "1.5");
+      outline.setAttribute("stroke-dasharray", String(perimeter));
+      outline.setAttribute("stroke-dashoffset", String(perimeter));
+      outline.classList.add("cursorbuild-wireframe-outline");
+      svg.appendChild(outline);
+
+      const mobile = window.matchMedia("(max-width: 650px)").matches;
+      const lineSpecs = mobile
+        ? [[width * 0.5, 0, width * 0.5, height], [0, height * 0.5, width, height * 0.5]]
+        : [[width * 0.33, 0, width * 0.33, height], [width * 0.66, 0, width * 0.66, height],
+           [0, height * 0.5, width, height * 0.5]];
+      lineSpecs.forEach(([x1, y1, x2, y2]) => {
+        const line = document.createElementNS(svg.namespaceURI, "line");
+        line.setAttribute("x1", String(x1));
+        line.setAttribute("y1", String(y1));
+        line.setAttribute("x2", String(x2));
+        line.setAttribute("y2", String(y2));
+        line.setAttribute("stroke", "#c83a8f");
+        line.setAttribute("stroke-width", "0.8");
+        line.setAttribute("stroke-opacity", mobile ? "0.25" : "0.32");
+        line.setAttribute("stroke-dasharray", "3 5");
+        line.classList.add("cursorbuild-wireframe-detail");
+        svg.appendChild(line);
+      });
+
+      host.appendChild(svg);
+      guides.add(svg);
+      return { svg, outline, width, height, perimeter };
     };
 
-    const construct = (agent, target) => {
-      const bounds = host.getBoundingClientRect();
-      const rect = target.getBoundingClientRect();
+    const buildOne = async (element) => {
+      if (!alive || !element?.isConnected) return;
+      const rect = element.getBoundingClientRect();
       if (!rect.width || !rect.height) {
-        busy.delete(agent);
-        later(pump, 60);
+        element.classList.remove("cursorbuild-unbuilt");
+        gsap.set(element, { autoAlpha: 1, y: 0 });
         return;
       }
-      const originalWidth = Math.max(1, target.offsetWidth || rect.width);
-      const originalHeight = Math.max(1, target.offsetHeight || rect.height);
-      const originalInlineWidth = target.style.width;
-      const originalInlineHeight = target.style.height;
-      const startWidth = Math.max(48, originalWidth * 0.76);
-      const startHeight = Math.max(36, originalHeight * 0.78);
-      const handle = { x: 1, y: 1 };
-      const startPoint = pointFor(rect, handle, bounds);
-      const cursorNode = host.querySelector(`.cursorbuild-cursor[data-cursor-id="${agent}"]`);
-      const hideCursor = () => {
-        if (cursorNode) {
-          cursorNode.style.opacity = "0";
-          cursorNode.style.visibility = "hidden";
-        }
-      };
-      const showCursor = () => {
-        if (cursorNode) {
-          cursorNode.style.visibility = "visible";
-          cursorNode.style.opacity = "1";
-        }
-      };
-      const finish = () => {
-        host.querySelectorAll(".cursorbuild-resize-frame").forEach((frame) => frame.remove());
-        target.style.width = originalInlineWidth;
-        target.style.height = originalInlineHeight;
-        later(() => {
-          host.querySelectorAll(".cursorbuild-resize-frame").forEach((frame) => frame.remove());
-          hideCursor();
-          busy.delete(agent);
-          pump();
-        }, 220);
-      };
 
-      // Place the hidden cursor beside its target before revealing it. This
-      // prevents the renderer's default top-left spawn positions from flashing.
-      renderer.moveTo(agent, {
-        x: Math.max(10, startPoint.x - 54),
-        y: Math.max(10, startPoint.y - 42)
-      }, 0);
-      showCursor();
+      active = true;
+      element.style.visibility = "visible";
+      const left = clamp(rect.left, 8, Math.max(8, window.innerWidth - 32));
+      const top = clamp(rect.top, 8, Math.max(8, window.innerHeight - 38));
+      const topLeft = cursorPoint(left, top);
 
-      const beginResize = () => {
-        if (!alive || !target.isConnected) {
-          hideCursor();
-          busy.delete(agent);
-          pump();
-          return;
-        }
-        try {
-          // Shrink the real DOM box, then let the cursor travel to the
-          // bottom-right handle and expand it back to its intended dimensions.
-          target.style.width = startWidth + "px";
-          target.style.height = startHeight + "px";
-          const build = renderer.resize(agent, {
-            target,
-            to: { width: originalWidth, height: originalHeight },
-            duration: 0.92,
-            curvature: 0.28,
-            handle: "bottom-right"
-          });
-          if (!build) {
-            target.style.width = originalInlineWidth;
-            target.style.height = originalInlineHeight;
-            finish();
-            return;
-          }
-          build.eventCallback("onComplete", () => {
-            if (!alive) return;
-            renderer.click(agent, { style: "ripple-press", duration: 0.3, intensity: 0.65 });
-            finish();
-          });
-        } catch {
-          target.style.width = originalInlineWidth;
-          target.style.height = originalInlineHeight;
-          finish();
-        }
-      };
+      // Approach the target before drawing its wireframe.
+      await waitForTimeline(renderer.moveNaturally(CURSOR_ID, topLeft, {
+        duration: TIMING.glide, ease: EASE, curvature: 0.12
+      }));
+      if (!alive) return;
 
-      beginResize();
+      const guide = makeGuide(rect);
+      const corners = [
+        cursorPoint(rect.left + 1, rect.top + 1),
+        cursorPoint(rect.right - 1, rect.top + 1),
+        cursorPoint(rect.right - 1, rect.bottom - 1),
+        cursorPoint(rect.left + 1, rect.bottom - 1),
+        cursorPoint(rect.left + 1, rect.top + 1)
+      ];
+
+      // The cursor traces the perimeter while the pink outline draws.
+      const drawTimeline = gsap.timeline();
+      drawTimeline.fromTo(guide.outline,
+        { strokeDashoffset: guide.perimeter },
+        { strokeDashoffset: 0, duration: TIMING.draw, ease: EASE }
+      );
+      const cursorDraw = renderer.moveSequence(CURSOR_ID, corners.map((point) => ({
+        to: point, duration: TIMING.draw / corners.length, ease: EASE, curvature: 0
+      })), { ease: EASE, curvature: 0 });
+      await Promise.all([waitForTimeline(drawTimeline), waitForTimeline(cursorDraw)]);
+      if (!alive) return;
+
+      // Let the wireframe read clearly before revealing any real content.
+      await new Promise((resolve) => gsap.delayedCall(TIMING.wireframeHold, resolve));
+      await new Promise((resolve) => gsap.delayedCall(TIMING.revealPause, resolve));
+      if (!alive) return;
+
+      await waitForTimeline(gsap.to(element, {
+        autoAlpha: 1,
+        y: 0,
+        duration: TIMING.contentReveal,
+        ease: EASE,
+        overwrite: "auto"
+      }));
+      element.classList.remove("cursorbuild-unbuilt");
+      if (!alive) return;
+
+      await waitForTimeline(gsap.to(guide.svg, {
+        opacity: 0,
+        duration: TIMING.guideFade,
+        ease: EASE
+      }));
+      guide.svg.remove();
+      guides.delete(guide.svg);
+      active = false;
+    };
+
+    const pump = async () => {
+      if (active || !alive) return;
+      const next = queue.shift();
+      if (!next) return;
+      try {
+        await buildOne(next);
+      } catch (error) {
+        console.error("[CursorBuild] Section construction failed:", error);
+        if (next?.isConnected) {
+          next.classList.remove("cursorbuild-unbuilt");
+          gsap.set(next, { autoAlpha: 1, y: 0 });
+        }
+        active = false;
+      }
+      if (alive) pump();
     };
 
     const onConstruct = (event) => {
       const target = event.detail?.target;
-      if (!(target instanceof HTMLElement) || !target.isConnected) return;
-      if (target.dataset.cursorbuildQueued === "true") return;
-      target.dataset.cursorbuildQueued = "true";
+      if (!(target instanceof HTMLElement) || !target.isConnected || queued.has(target)) return;
+      queued.add(target);
       queue.push(target);
       pump();
     };
@@ -186,11 +226,12 @@ export default function CursorBuildPointers() {
     window.addEventListener("cursorbuild:construct", onConstruct);
     return () => {
       alive = false;
-      timers.forEach((timer) => window.clearTimeout(timer));
-      timers.clear();
-      queue.length = 0;
+      window.cancelAnimationFrame(trailFrame);
       window.removeEventListener("cursorbuild:construct", onConstruct);
-      host.querySelectorAll(".cursorbuild-resize-frame").forEach((frame) => frame.remove());
+      guides.forEach((guide) => guide.remove());
+      guides.clear();
+      gsap.killTweensOf(trail);
+      trail.remove();
       renderer.destroy();
       manager.destroy();
     };
