@@ -83,6 +83,15 @@ export default function CursorBuildScroll() {
       window.requestAnimationFrame(check);
     });
     const waitForBuildGroup = (group) => new Promise((resolve) => {
+      // Preserve the page's visual reading order: top row first, then lower rows.
+      // The same seven cursor workers share the task queue for the whole section.
+      group.sort((a, b) => {
+        const ar = a.getBoundingClientRect();
+        const br = b.getBoundingClientRect();
+        const rowTolerance = 18;
+        if (Math.abs(ar.top - br.top) > rowTolerance) return ar.top - br.top;
+        return ar.left - br.left;
+      });
       window.dispatchEvent(new CustomEvent("cursorbuild:section-start"));
       let remaining = group.length;
       if (!remaining) return resolve();
