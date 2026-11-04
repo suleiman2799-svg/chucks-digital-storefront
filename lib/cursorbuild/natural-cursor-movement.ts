@@ -1,5 +1,5 @@
 import { gsap } from "gsap";
-import type { CursorPoint } from "./cursor-renderer.ts";
+import type { CursorPoint } from "./cursor-renderer";
 
 export interface NaturalMoveOptions {
   /** Duration in seconds for each segment. */
