@@ -53,15 +53,52 @@ export default function CursorBuildScroll() {
 
     const demoMode = new URLSearchParams(window.location.search).get("cursorbuild") === "demo";
     let observer;
+    let demoLocked = false;
+    const blockDemoScroll = (event) => {
+      if (demoLocked) event.preventDefault();
+    };
+    const blockDemoKeys = (event) => {
+      if (demoLocked && ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) {
+        event.preventDefault();
+      }
+    };
+    const waitForScrollToSettle = (element) => new Promise((resolve) => {
+      element.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+      let previousY = window.scrollY;
+      let stableFrames = 0;
+      let frames = 0;
+      const check = () => {
+        frames += 1;
+        const currentY = window.scrollY;
+        stableFrames = Math.abs(currentY - previousY) < 0.5 ? stableFrames + 1 : 0;
+        previousY = currentY;
+        if (stableFrames >= 5 || frames >= 240) resolve();
+        else window.requestAnimationFrame(check);
+      };
+      window.requestAnimationFrame(check);
+    });
+    const waitForBuild = (element) => new Promise((resolve) => {
+      const onComplete = (event) => {
+        if (event.detail?.target !== element) return;
+        window.removeEventListener("cursorbuild:complete", onComplete);
+        resolve();
+      };
+      window.addEventListener("cursorbuild:complete", onComplete);
+      window.dispatchEvent(new CustomEvent("cursorbuild:construct", { detail: { target: element } }));
+    });
+
     if (demoMode) {
-      document.documentElement.classList.add("cursorbuild-demo-lock");
-      document.body.classList.add("cursorbuild-demo-lock");
-      window.requestAnimationFrame(() => {
-        elements.forEach((element) => {
-          window.dispatchEvent(new CustomEvent("cursorbuild:construct", {
-            detail: { target: element }
-          }));
-        });
+      window.addEventListener("wheel", blockDemoScroll, { passive: false });
+      window.addEventListener("touchmove", blockDemoScroll, { passive: false });
+      window.addEventListener("keydown", blockDemoKeys);
+      window.requestAnimationFrame(async () => {
+        for (const element of elements) {
+          if (!element.isConnected) continue;
+          await waitForScrollToSettle(element);
+          demoLocked = true;
+          await waitForBuild(element);
+          demoLocked = false;
+        }
       });
     } else if ("IntersectionObserver" in window) {
       observer = new IntersectionObserver((entries) => {
@@ -84,8 +121,9 @@ export default function CursorBuildScroll() {
 
     return () => {
       observer?.disconnect();
-      document.documentElement.classList.remove("cursorbuild-demo-lock");
-      document.body.classList.remove("cursorbuild-demo-lock");
+      window.removeEventListener("wheel", blockDemoScroll);
+      window.removeEventListener("touchmove", blockDemoScroll);
+      window.removeEventListener("keydown", blockDemoKeys);
       elements.forEach((element) => {
         element.classList.remove("cursorbuild-unbuilt");
         gsap.set(element, { clearProps: "opacity,visibility,transform" });
