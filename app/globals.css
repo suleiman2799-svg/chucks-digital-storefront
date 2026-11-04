@@ -364,3 +364,59 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 .cursorbuild-landing-only .cursorbuild-cursor__shape{fill:#000!important;stroke:#000!important}
 .cursorbuild-landing-only .cursorbuild-resize-frame{border-color:#111!important;outline-color:rgba(0,0,0,.2)!important;box-shadow:0 0 0 1px rgba(255,255,255,.28)!important}
 .cursorbuild-landing-only .cursorbuild-resize-handle{background:#111!important;border-color:#fff!important}
+
+
+/* CursorBuild polish pass: single persistent designer pointer and deliberate wireframe reveal. */
+.cursorbuild-pointer-layer.cursorbuild-landing-only{
+  position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;
+  overflow:hidden!important;pointer-events:none!important;z-index:9999!important;isolation:isolate!important;
+}
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-overlay{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  pointer-events:none!important;z-index:4!important;
+}
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor{
+  opacity:1!important;visibility:visible!important;display:flex!important;z-index:5!important;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.9)) drop-shadow(0 0 5px rgba(255,255,255,.42))!important;
+  will-change:transform;
+}
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor__pointer,
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor__pointer svg{
+  width:25px!important;height:30px!important;flex:none!important;
+}
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor__shape{
+  fill:#fff!important;stroke:#111!important;stroke-width:1.8!important;
+  stroke-linejoin:round!important;paint-order:stroke fill!important;
+}
+.cursorbuild-pointer-layer.cursorbuild-landing-only .cursorbuild-cursor__label{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  margin:9px 0 0 3px!important;padding:4px 7px!important;border:1px solid rgba(0,0,0,.7)!important;
+  border-radius:4px!important;background:#fff!important;color:#171717!important;
+  font:700 9px/1.1 Inter,ui-sans-serif,system-ui,sans-serif!important;letter-spacing:.02em!important;
+  box-shadow:0 2px 8px rgba(0,0,0,.28)!important;text-shadow:none!important;
+}
+.cursorbuild-motion-trail{
+  position:absolute;left:0;top:0;width:7px;height:7px;border-radius:50%;
+  background:rgba(255,255,255,.92);border:1px solid rgba(17,17,17,.78);
+  box-shadow:0 0 7px rgba(255,255,255,.62),0 1px 3px rgba(0,0,0,.45);
+  pointer-events:none;z-index:3;opacity:.16;will-change:transform,opacity;
+  transition:transform 120ms ease-out,opacity 120ms ease-out;
+}
+.cursorbuild-wireframe{
+  position:fixed;display:block;overflow:visible;pointer-events:none;z-index:2;
+  opacity:1;will-change:opacity;shape-rendering:geometricPrecision;
+}
+.cursorbuild-wireframe-outline,.cursorbuild-wireframe-detail{
+  vector-effect:non-scaling-stroke;
+}
+.cursorbuild-unbuilt{
+  opacity:0!important;visibility:hidden!important;
+  clip-path:none!important;will-change:opacity,transform!important;
+}
+.cursorbuild-demo-lock{overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important}
+@media(max-width:650px){
+  .cursorbuild-wireframe-detail{stroke-dasharray:2 6}
+}
+@media(prefers-reduced-motion:reduce){
+  .cursorbuild-motion-trail{transition:none}
+}
