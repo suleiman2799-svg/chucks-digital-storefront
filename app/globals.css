@@ -295,3 +295,9 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 .cursorbuild-resize-frame[data-grabbed] .cursorbuild-resize-handle.is-grabbed{background:#fff;border-color:#a99bff;transform:translate(-50%,-50%) scale(1.35);box-shadow:0 0 0 4px rgba(169,155,255,.2),0 1px 5px rgba(0,0,0,.4)}
 @media(prefers-reduced-motion:reduce){.cursorbuild-resize-handle{transition:none}}
 
+
+
+/* Fixed, non-interactive CursorBuild collaborator layer. */
+.cursorbuild-pointer-layer{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;overflow:hidden;pointer-events:none!important;z-index:9999;isolation:isolate;}
+.cursorbuild-pointer-layer .cursorbuild-overlay{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;pointer-events:none!important;}
+@media (pointer:coarse){.cursorbuild-pointer-layer{display:none!important;}}
