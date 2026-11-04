@@ -77,6 +77,9 @@ export default function CursorBuildPointers() {
     };
     trailFrame = window.requestAnimationFrame(updateTrail);
 
+    const notifyComplete = (target) => {
+      window.dispatchEvent(new CustomEvent("cursorbuild:complete", { detail: { target } }));
+    };
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
     const cursorPoint = (x, y) => ({
       x: clamp(x, 8, Math.max(8, window.innerWidth - 32)),
@@ -141,6 +144,7 @@ export default function CursorBuildPointers() {
       if (!rect.width || !rect.height) {
         element.classList.remove("cursorbuild-unbuilt");
         gsap.set(element, { autoAlpha: 1, y: 0 });
+        notifyComplete(element);
         return;
       }
 
@@ -200,6 +204,7 @@ export default function CursorBuildPointers() {
       guide.svg.remove();
       guides.delete(guide.svg);
       active = false;
+      notifyComplete(element);
     };
 
     const pump = async () => {
@@ -215,6 +220,7 @@ export default function CursorBuildPointers() {
           gsap.set(next, { autoAlpha: 1, y: 0 });
         }
         active = false;
+        notifyComplete(next);
       }
       if (alive) pump();
     };
