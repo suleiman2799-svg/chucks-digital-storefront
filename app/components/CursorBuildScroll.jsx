@@ -5,7 +5,9 @@ import { gsap } from "gsap";
 
 const BUILD_SELECTORS = [
   ".arrival-nav .arrival-brand",
-  ".arrival-nav .arrival-nav-links",
+  ".arrival-nav .arrival-nav-links a:nth-child(1)",
+  ".arrival-nav .arrival-nav-links a:nth-child(2)",
+  ".arrival-nav .arrival-nav-links a:nth-child(3)",
   ".arrival-nav .arrival-nav-cta",
   ".arrival-coordinate",
   ".arrival-orbit",
@@ -78,26 +80,42 @@ export default function CursorBuildScroll() {
       };
       window.requestAnimationFrame(check);
     });
-    const waitForBuild = (element) => new Promise((resolve) => {
+    const waitForBuildGroup = (group) => new Promise((resolve) => {
+      let remaining = group.length;
+      if (!remaining) return resolve();
+      const completed = new Set();
       const onComplete = (event) => {
-        if (event.detail?.target !== element) return;
-        window.removeEventListener("cursorbuild:complete", onComplete);
-        resolve();
+        const target = event.detail?.target;
+        if (!group.includes(target) || completed.has(target)) return;
+        completed.add(target);
+        remaining -= 1;
+        if (remaining <= 0) {
+          window.removeEventListener("cursorbuild:complete", onComplete);
+          resolve();
+        }
       };
       window.addEventListener("cursorbuild:complete", onComplete);
-      window.dispatchEvent(new CustomEvent("cursorbuild:construct", { detail: { target: element } }));
+      group.forEach((target) => window.dispatchEvent(new CustomEvent("cursorbuild:construct", {
+        detail: { target }
+      })));
     });
 
     if (demoMode) {
       window.addEventListener("wheel", blockDemoScroll, { passive: false });
       window.addEventListener("touchmove", blockDemoScroll, { passive: false });
       window.addEventListener("keydown", blockDemoKeys);
+      const groups = new Map();
+      elements.forEach((element) => {
+        const section = element.closest("header, section, footer") || document.body;
+        if (!groups.has(section)) groups.set(section, []);
+        groups.get(section).push(element);
+      });
       window.requestAnimationFrame(async () => {
-        for (const element of elements) {
-          if (!element.isConnected) continue;
-          await waitForScrollToSettle(element);
+        for (const [section, group] of groups) {
+          if (!section.isConnected) continue;
+          await waitForScrollToSettle(group[0]);
           demoLocked = true;
-          await waitForBuild(element);
+          await waitForBuildGroup(group);
           demoLocked = false;
         }
       });
