@@ -260,6 +260,7 @@ export default function CursorBuildPointers() {
     };
 
     const onAllComplete = () => {
+      host.classList.add("cursorbuild-team-finished");
       gsap.to([...cursorNodes, ...trails].filter(Boolean), {
         autoAlpha: 0,
         duration: 0.4,
