@@ -26,6 +26,15 @@ export default function CursorBuildMotion() {
     animate(".arrival-wings .wing-card", { duration: 0.75, stagger: 0.14 });
     animate(".arrival-invitation .invitation-copy", { duration: 0.9 });
     animate(".arrival-footer .arrival-brand, .arrival-footer .arrival-footer-links", { duration: 0.7, stagger: 0.1 });
+    animate(".hero-copy", { duration: 0.9 });
+    animate(".lobby", { duration: 0.7 });
+    animate(".section-head", { duration: 0.8 });
+    animate(".doors .door", { duration: 0.75, stagger: 0.1 });
+    animate(".spot-copy", { duration: 0.85 });
+    animate(".products .product", { duration: 0.7, stagger: 0.1 });
+    animate(".collection-grid .collection", { duration: 0.75, stagger: 0.12 });
+    animate(".service-list .service", { duration: 0.65, stagger: 0.08 });
+    animate(".visit-copy", { duration: 0.85 });
 
     return () => engine.destroy();
   }, []);
