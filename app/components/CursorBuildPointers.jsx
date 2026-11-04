@@ -9,7 +9,7 @@ export default function CursorBuildPointers() {
   const hostRef = useRef(null);
 
   useEffect(() => {
-    if (!hostRef.current || !window.matchMedia("(pointer: fine)").matches) return;
+    if (!hostRef.current) return;
 
     const manager = new CursorManager();
     manager.add({ id: "visitor", name: "You", color: "#C83A8F" });
@@ -19,8 +19,8 @@ export default function CursorBuildPointers() {
     const renderer = new CursorRenderer(manager, hostRef.current, {
       maxVisible: 2,
       tabletMaxVisible: 2,
-      mobileMaxVisible: 0,
-      touchMaxVisible: 0,
+      mobileMaxVisible: 2,
+      touchMaxVisible: 2,
       duration: 0.32,
       ease: "power2.out",
       respectReducedMotion: true,
@@ -30,7 +30,6 @@ export default function CursorBuildPointers() {
     let frame = 0;
     let latest = null;
     const onPointerMove = (event) => {
-      if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
       latest = { x: event.clientX, y: event.clientY };
       if (frame) return;
       frame = window.requestAnimationFrame(() => {
@@ -46,7 +45,9 @@ export default function CursorBuildPointers() {
     };
     let clickSequence = 0;
     const onPointerDown = (event) => {
-      if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+      const point = { x: event.clientX, y: event.clientY };
+      renderer.moveTo("visitor", point, 0.08);
+      renderer.moveTo("chucks-guide", { x: Math.max(8, point.x - 30), y: Math.max(8, point.y + 22) }, 0.18);
       const groupId = "pointer-click-" + (++clickSequence);
       const visitorTrack = coordination.createTimeline("visitor", [{
         id: groupId + "-visitor",
