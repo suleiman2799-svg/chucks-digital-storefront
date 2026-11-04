@@ -9,6 +9,7 @@ const BUILD_SELECTORS = [
   ".arrival-nav .arrival-nav-cta",
   ".arrival-coordinate",
   ".arrival-orbit",
+  ".arrival-hero-video",
   ".arrival-copy .arrival-logo-reveal",
   ".arrival-copy .arrival-kicker",
   ".arrival-copy h1",
