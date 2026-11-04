@@ -20,12 +20,8 @@ export default function CursorBuildMotion() {
       });
     };
 
-    // Keep content visible if the browser has reduced motion enabled.
-    animate(".arrival-intro .intro-content", { duration: 0.9 });
-    animate(".arrival-wings .wings-heading", { duration: 0.85 });
-    animate(".arrival-wings .wing-card", { duration: 0.75, stagger: 0.14 });
-    animate(".arrival-invitation .invitation-copy", { duration: 0.9 });
-    animate(".arrival-footer .arrival-brand, .arrival-footer .arrival-footer-links", { duration: 0.7, stagger: 0.1 });
+    // Keep above-the-fold shop content cinematic; below-the-fold sections are
+    // deliberately controlled by CursorBuildScroll so the cursors construct them.
     animate(".hero-copy", { duration: 0.9 });
     animate(".lobby", { duration: 0.7 });
     animate(".spot-copy", { duration: 0.85 });
