@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+<defs>
+ <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#34303b"/><stop offset=".52" stop-color="#202228"/><stop offset="1" stop-color="#111418"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#c83a8f" stop-opacity=".34"/><stop offset="1" stop-color="#c83a8f" stop-opacity="0"/></radialGradient>
+ <linearGradient id="glass" x2="1" y2="1"><stop stop-color="#d7b6cc" stop-opacity=".42"/><stop offset=".5" stop-color="#9dc6ae" stop-opacity=".18"/><stop offset="1" stop-color="#fff" stop-opacity=".04"/></linearGradient>
+</defs>
+<rect width="1600" height="900" fill="url(#bg)"/><ellipse cx="1120" cy="420" rx="620" ry="480" fill="url(#glow)"/>
+<g opacity=".16" stroke="#fff" fill="none"><ellipse cx="1110" cy="455" rx="520" ry="350"/><ellipse cx="1110" cy="455" rx="430" ry="290"/></g>
+<path d="M650 700 720 260 1450 260 1530 700Z" fill="#171a1e" stroke="#66616a" stroke-width="4"/>
+<path d="M700 260 770 205 1400 205 1450 260Z" fill="#34363a" stroke="#81747b" stroke-width="3"/>
+<path d="M780 305H1395V600H780Z" fill="url(#glass)" stroke="#a89ba4" stroke-opacity=".5" stroke-width="4"/>
+<g stroke="#d8c5d2" stroke-opacity=".35" stroke-width="12"><path d="M860 310V600M980 310V600M1100 310V600M1220 310V600M1340 310V600"/></g>
+<path d="M755 610H1430V650H755Z" fill="#111418"/><path d="M650 700H1530L1600 760H580Z" fill="#777078" opacity=".45"/>
+<text x="1075" y="175" fill="#f3d7e7" font-family="Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="15" text-anchor="middle">CHUCKS</text>
+<text x="1075" y="790" fill="#c6bdc1" font-family="Arial,sans-serif" font-size="18" letter-spacing="9" text-anchor="middle">SHOPPING MALL · LOKOJA, NIGERIA</text>
+</svg>
