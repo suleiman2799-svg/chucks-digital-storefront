@@ -34,13 +34,6 @@ const REVEAL_SELECTORS = [
   ".arrival-footer > p",
   ".arrival-footer .arrival-legal",
   ".arrival-footer .arrival-credit",
-  // Shop page targets remain supported.
-  ".section-head",
-  ".doors .door",
-  ".products .product",
-  ".collection-grid .collection",
-  ".service-list .service",
-  ".visit-copy"
 ];
 
 export default function CursorBuildScroll() {
