@@ -337,8 +337,8 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 
 /* CursorBuild cinematic assembly: targets begin concealed and are revealed by scroll timelines. */
 .cursorbuild-unbuilt{
-  opacity:0!important;
-  visibility:hidden!important;
+  opacity:0;
+  visibility:hidden;
   clip-path:inset(0 100% 0 0 round 10px);
   will-change:opacity,transform,clip-path,width,height;
 }
