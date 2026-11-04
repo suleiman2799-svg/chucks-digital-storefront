@@ -410,7 +410,7 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
   vector-effect:non-scaling-stroke;
 }
 .cursorbuild-unbuilt{
-  opacity:0!important;visibility:hidden!important;
+  opacity:0;visibility:hidden;
   clip-path:none!important;will-change:opacity,transform!important;
 }
 .cursorbuild-demo-lock{overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important}
