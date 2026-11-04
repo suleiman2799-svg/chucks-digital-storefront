@@ -40,6 +40,12 @@ export default function CursorBuildPointers() {
       clickFeedback: { style: "ripple-press", duration: 0.34, intensity: 0.7 }
     });
 
+    host.querySelectorAll(".cursorbuild-cursor").forEach((node) => {
+      node.style.opacity = "0";
+      node.style.visibility = "hidden";
+      node.style.transition = "opacity 160ms ease";
+    });
+
     const queue = [];
     const busy = new Set();
     let nextAgent = 0;
@@ -95,61 +101,83 @@ export default function CursorBuildPointers() {
       const startHeight = Math.max(36, originalHeight * 0.78);
       const handle = { x: 1, y: 1 };
       const startPoint = pointFor(rect, handle, bounds);
+      const cursorNode = host.querySelector(`.cursorbuild-cursor[data-cursor-id="${agent}"]`);
+      const hideCursor = () => {
+        if (cursorNode) {
+          cursorNode.style.opacity = "0";
+          cursorNode.style.visibility = "hidden";
+        }
+      };
+      const showCursor = () => {
+        if (cursorNode) {
+          cursorNode.style.visibility = "visible";
+          cursorNode.style.opacity = "1";
+        }
+      };
+      const finish = () => {
+        host.querySelectorAll(".cursorbuild-resize-frame").forEach((frame) => frame.remove());
+        target.style.width = originalInlineWidth;
+        target.style.height = originalInlineHeight;
+        later(() => {
+          host.querySelectorAll(".cursorbuild-resize-frame").forEach((frame) => frame.remove());
+          hideCursor();
+          busy.delete(agent);
+          pump();
+        }, 220);
+      };
 
-      renderer.moveNaturally(agent, {
-        x: Math.max(12, startPoint.x - 54),
-        y: Math.max(12, startPoint.y - 42)
-      }, { duration: 0.52, curvature: 0.24, ease: "power2.inOut" });
+      // Place the hidden cursor beside its target before revealing it. This
+      // prevents the renderer's default top-left spawn positions from flashing.
+      renderer.moveTo(agent, {
+        x: Math.max(10, startPoint.x - 54),
+        y: Math.max(10, startPoint.y - 42)
+      }, 0);
+      showCursor();
 
-      later(() => {
-        if (!target.isConnected) {
+      const approach = renderer.moveNaturally(agent, {
+        x: Math.max(10, startPoint.x - 54),
+        y: Math.max(10, startPoint.y - 42)
+      }, { duration: 0.01, curvature: 0.12, ease: "power2.inOut" });
+
+      const beginResize = () => {
+        if (!alive || !target.isConnected) {
+          hideCursor();
           busy.delete(agent);
           pump();
           return;
         }
         try {
-          // Collapse the real DOM box first, then have the cursor physically
-          // pull its resize handle out to the element's finished dimensions.
-          renderer.resize(agent, {
-            target,
-            to: { width: startWidth, height: startHeight },
-            duration: 0,
-            handle: "bottom-right"
-          });
+          // Shrink the real DOM box, then let the cursor travel to the
+          // bottom-right handle and expand it back to its intended dimensions.
+          target.style.width = startWidth + "px";
+          target.style.height = startHeight + "px";
           const build = renderer.resize(agent, {
             target,
             to: { width: originalWidth, height: originalHeight },
-            duration: 0.88,
+            duration: 0.92,
             curvature: 0.28,
             handle: "bottom-right"
           });
           if (!build) {
             target.style.width = originalInlineWidth;
             target.style.height = originalInlineHeight;
-            busy.delete(agent);
-            pump();
+            finish();
             return;
           }
           build.eventCallback("onComplete", () => {
             if (!alive) return;
             renderer.click(agent, { style: "ripple-press", duration: 0.3, intensity: 0.65 });
-            // Defensive cleanup: never leave a smart-guide frame on the page.
-            host.querySelectorAll(".cursorbuild-resize-frame").forEach((frame) => frame.remove());
-            target.style.width = originalInlineWidth;
-            target.style.height = originalInlineHeight;
-            later(() => {
-              host.querySelectorAll(".cursorbuild-resize-frame").forEach((frame) => frame.remove());
-              busy.delete(agent);
-              pump();
-            }, 240);
+            finish();
           });
         } catch {
           target.style.width = originalInlineWidth;
           target.style.height = originalInlineHeight;
-          busy.delete(agent);
-          pump();
+          finish();
         }
-      }, 180);
+      };
+
+      if (approach) approach.eventCallback("onComplete", beginResize);
+      else beginResize();
     };
 
     const onConstruct = (event) => {
@@ -168,6 +196,7 @@ export default function CursorBuildPointers() {
       timers.clear();
       queue.length = 0;
       window.removeEventListener("cursorbuild:construct", onConstruct);
+      host.querySelectorAll(".cursorbuild-resize-frame").forEach((frame) => frame.remove());
       renderer.destroy();
       manager.destroy();
     };
