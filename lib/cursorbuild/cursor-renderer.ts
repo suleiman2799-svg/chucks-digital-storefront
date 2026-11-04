@@ -1,9 +1,9 @@
 import { gsap } from "gsap";
-import type { CursorManager } from "./cursor-manager.ts";
-import type { CursorIdentity } from "../types.ts";
-import { NaturalCursorMovementEngine } from "./natural-cursor-movement.ts";
-import type { NaturalMoveOptions, NaturalMovementOptions, NaturalMovementStep } from "./natural-cursor-movement.ts";
-import { getNaturalControlPoints } from "./natural-cursor-movement.ts";
+import type { CursorManager } from "./cursor-manager";
+import type { CursorIdentity } from "../types";
+import { NaturalCursorMovementEngine } from "./natural-cursor-movement";
+import type { NaturalMoveOptions, NaturalMovementOptions, NaturalMovementStep } from "./natural-cursor-movement";
+import { getNaturalControlPoints } from "./natural-cursor-movement";
 
 export interface CursorPoint { x: number; y: number; }
 export type CursorClickStyle = "ripple" | "press" | "ripple-press";
