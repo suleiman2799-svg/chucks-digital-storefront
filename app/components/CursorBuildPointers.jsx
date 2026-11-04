@@ -10,9 +10,8 @@ const TIMING = {
   glide: 0.3,
   draw: 0.4,
   wireframeHold: 0.25,
-  revealPause: 0.1,
   contentReveal: 0.3,
-  guideFade: 0.3
+  guideFade: 0.25
 };
 const TEAM = [
   ["designer", "#c83a8f"],
@@ -186,7 +185,7 @@ export default function CursorBuildPointers() {
       }
 
       const cursorId = `designer-${cursorIndex + 1}`;
-      const color = team[cursorIndex][1];
+      const color = "#c83a8f";
       const topLeft = cursorPoint(rect.left + 1, rect.top + 1);
       const corners = [
         topLeft,
@@ -219,7 +218,6 @@ export default function CursorBuildPointers() {
       if (!alive) return;
 
       await new Promise((resolve) => gsap.delayedCall(TIMING.wireframeHold, resolve));
-      await new Promise((resolve) => gsap.delayedCall(TIMING.revealPause, resolve));
       if (!alive) return;
 
       await waitForTimeline(gsap.to(element, {
@@ -261,6 +259,15 @@ export default function CursorBuildPointers() {
       if (alive && queues[cursorIndex].length) pump(cursorIndex);
     };
 
+    const onAllComplete = () => {
+      gsap.to([...cursorNodes, ...trails].filter(Boolean), {
+        autoAlpha: 0,
+        duration: 0.4,
+        ease: "power2.out",
+        overwrite: true
+      });
+    };
+
     const onConstruct = (event) => {
       const target = event.detail?.target;
       if (!(target instanceof HTMLElement) || !target.isConnected || queuedTargets.has(target)) return;
@@ -271,10 +278,12 @@ export default function CursorBuildPointers() {
     };
 
     window.addEventListener("cursorbuild:construct", onConstruct);
+    window.addEventListener("cursorbuild:all-complete", onAllComplete);
     return () => {
       alive = false;
       window.cancelAnimationFrame(trailFrame);
       window.removeEventListener("cursorbuild:construct", onConstruct);
+      window.removeEventListener("cursorbuild:all-complete", onAllComplete);
       guides.forEach((guide) => guide.remove());
       guides.clear();
       trails.forEach((trail) => trail.remove());
