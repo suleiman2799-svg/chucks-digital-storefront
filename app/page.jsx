@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import CursorBuildMotion from "./components/CursorBuildMotion";
+import CursorBuildPointers from "./components/CursorBuildPointers";
 import CursorBuildScroll from "./components/CursorBuildScroll";
 
 const wings = [
@@ -60,6 +61,7 @@ export default function Landing() {
   return <main className={"arrival " + (ready ? "arrival-ready" : "")}>
     <CursorBuildMotion />
     <CursorBuildScroll />
+    <CursorBuildPointers />
     <div className="arrival-grain" aria-hidden="true" />
     <header className="arrival-nav">
       <a className="arrival-brand" href="/" aria-label="Chucks Shopping Mall home"><img className="arrival-brand-mark" src="/assets/chucks-logo.png" alt="" aria-hidden="true"/><b>CHUCKS<small>SHOPPING MALL · LOKOJA</small></b></a>
