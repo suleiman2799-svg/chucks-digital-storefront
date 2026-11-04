@@ -351,3 +351,8 @@ footer{background:#202226;color:white;padding:55px 8.5% 20px;position:relative}.
 @media(prefers-reduced-motion:reduce){
   .cursorbuild-unbuilt{clip-path:none!important;will-change:auto}
 }
+
+/* CursorBuild construction overlay: monochrome cursors, no name tags, no lingering guides. */
+.cursorbuild-pointer-layer .cursorbuild-cursor__label { display: none !important; }
+.cursorbuild-pointer-layer .cursorbuild-cursor__shape { fill: #000 !important; }
+.cursorbuild-pointer-layer .cursorbuild-resize-frame { border-color: rgba(0,0,0,.55) !important; }
