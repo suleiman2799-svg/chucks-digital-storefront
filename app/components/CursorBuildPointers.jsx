@@ -5,14 +5,18 @@ import { CursorManager } from "../../lib/cursorbuild/cursor-manager";
 import { CursorRenderer } from "../../lib/cursorbuild/cursor-renderer";
 
 const AGENTS = [
-  ["architect", "Architect", "#C83A8F"],
-  ["builder", "Builder", "#0BAE4E"],
-  ["designer", "Designer", "#F28BC2"],
-  ["stylist", "Stylist", "#B8D96B"],
-  ["maker", "Maker", "#FF896D"],
-  ["finisher", "Finisher", "#A99BFF"],
-  ["curator", "Curator", "#62C7C0"],
-  ["detailer", "Detailer", "#F4C66A"]
+  ["architect", "", "#000000"],
+  ["builder", "", "#000000"],
+  ["designer", "", "#000000"],
+  ["stylist", "", "#000000"],
+  ["maker", "", "#000000"],
+  ["finisher", "", "#000000"],
+  ["curator", "", "#000000"],
+  ["detailer", "", "#000000"],
+  ["sculptor", "", "#000000"],
+  ["navigator", "", "#000000"],
+  ["composer", "", "#000000"],
+  ["polisher", "", "#000000"]
 ];
 
 export default function CursorBuildPointers() {
@@ -25,10 +29,10 @@ export default function CursorBuildPointers() {
     const manager = new CursorManager();
     AGENTS.forEach(([id, name, color]) => manager.add({ id, name, color }));
     const renderer = new CursorRenderer(manager, host, {
-      maxVisible: 8,
-      tabletMaxVisible: 8,
-      mobileMaxVisible: 6,
-      touchMaxVisible: 6,
+      maxVisible: 12,
+      tabletMaxVisible: 12,
+      mobileMaxVisible: 12,
+      touchMaxVisible: 12,
       allowExternalResizeTargets: true,
       duration: 0.55,
       ease: "power3.inOut",
@@ -129,9 +133,12 @@ export default function CursorBuildPointers() {
           build.eventCallback("onComplete", () => {
             if (!alive) return;
             renderer.click(agent, { style: "ripple-press", duration: 0.3, intensity: 0.65 });
+            // Defensive cleanup: never leave a smart-guide frame on the page.
+            host.querySelectorAll(".cursorbuild-resize-frame").forEach((frame) => frame.remove());
             target.style.width = originalInlineWidth;
             target.style.height = originalInlineHeight;
             later(() => {
+              host.querySelectorAll(".cursorbuild-resize-frame").forEach((frame) => frame.remove());
               busy.delete(agent);
               pump();
             }, 240);
@@ -166,5 +173,5 @@ export default function CursorBuildPointers() {
     };
   }, []);
 
-  return <div ref={hostRef} className="cursorbuild-pointer-layer" aria-hidden="true" />;
+  return <div ref={hostRef} className="cursorbuild-pointer-layer cursorbuild-landing-only" aria-hidden="true" />;
 }
