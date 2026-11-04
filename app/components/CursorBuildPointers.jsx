@@ -65,13 +65,30 @@ export default function CursorBuildPointers() {
       void group.run().catch(() => {}).finally(() => coordination.destroyGroup(groupId));
     };
 
-    // Each scroll scene now runs a real renderer resize simulation on the
-    // page element itself. The second cursor shadows the work and confirms it.
-    const onConstruct = (event) => {
-      const target = event.detail?.target;
-      if (!(target instanceof HTMLElement) || !target.isConnected) return;
+    // Serialize construction passes so fast scrolling cannot start two resize
+    // operations on the same cursor/element at once.
+    const constructionQueue = [];
+    const constructionTimers = new Set();
+    let constructionBusy = false;
+    let alive = true;
+    const later = (fn, delay) => {
+      const timer = window.setTimeout(() => {
+        constructionTimers.delete(timer);
+        if (alive) fn();
+      }, delay);
+      constructionTimers.add(timer);
+      return timer;
+    };
+    const processConstruction = () => {
+      if (!alive || constructionBusy || !constructionQueue.length) return;
+      const target = constructionQueue.shift();
+      if (!(target instanceof HTMLElement) || !target.isConnected) {
+        processConstruction();
+        return;
+      }
+      constructionBusy = true;
       const bounds = hostRef.current?.getBoundingClientRect();
-      if (!bounds) return;
+      if (!bounds) { constructionBusy = false; return; }
       const rect = target.getBoundingClientRect();
       const center = {
         x: Math.max(12, Math.min(window.innerWidth - 32, rect.left + rect.width / 2 - bounds.left)),
@@ -82,39 +99,63 @@ export default function CursorBuildPointers() {
         x: Math.max(12, center.x - 34), y: Math.max(12, center.y + 24)
       }, { duration: 0.58, curvature: 0.18, ease: "power2.inOut" });
 
-      // Resize by a restrained amount so the effect is clearly visible without
-      // breaking the page's responsive layout; then restore the original size.
-      const width = Math.max(1, rect.width);
-      const height = Math.max(1, rect.height);
+      // Use untransformed border-box dimensions so the restore pass is exact.
+      const width = Math.max(1, target.offsetWidth || rect.width);
+      const height = Math.max(1, target.offsetHeight || rect.height);
       const targetWidth = Math.max(48, Math.min(width * 1.035, width + 28));
       const targetHeight = Math.max(36, Math.min(height * 1.025, height + 20));
-      const build = () => {
-        if (!target.isConnected) return;
-        const timeline = renderer.resize("visitor", {
-          target,
-          to: { width: targetWidth, height: targetHeight },
-          duration: 0.72,
-          curvature: 0.2,
-          handle: "bottom-right"
-        });
-        if (timeline) {
-          timeline.eventCallback("onComplete", () => {
+      const finish = () => {
+        constructionBusy = false;
+        later(processConstruction, 100);
+      };
+      later(() => {
+        if (!target.isConnected) { finish(); return; }
+        try {
+          const build = renderer.resize("visitor", {
+            target,
+            to: { width: targetWidth, height: targetHeight },
+            duration: 0.72,
+            curvature: 0.2,
+            handle: "bottom-right"
+          });
+          if (!build) {
+            renderer.resize("visitor", { target, to: { width, height }, duration: 0 });
+            finish();
+            return;
+          }
+          build.eventCallback("onComplete", () => {
+            if (!alive) return;
             renderer.click("chucks-guide", { style: "ripple-press", duration: 0.24, intensity: 0.45 });
-            window.setTimeout(() => {
-              if (!target.isConnected) return;
-              const restore = renderer.resize("visitor", {
-                target,
-                to: { width, height },
-                duration: 0.52,
-                curvature: 0.16,
-                handle: "bottom-right"
-              });
-              restore?.eventCallback("onComplete", () => renderer.click("visitor", { duration: 0.2 }));
+            later(() => {
+              if (!target.isConnected) { finish(); return; }
+              try {
+                const restore = renderer.resize("visitor", {
+                  target,
+                  to: { width, height },
+                  duration: 0.52,
+                  curvature: 0.16,
+                  handle: "bottom-right"
+                });
+                if (restore) restore.eventCallback("onComplete", () => {
+                  renderer.click("visitor", { duration: 0.2 });
+                  finish();
+                });
+                else finish();
+              } catch {
+                finish();
+              }
             }, 180);
           });
+        } catch {
+          finish();
         }
-      };
-      window.setTimeout(build, 460);
+      }, 460);
+    };
+    const onConstruct = (event) => {
+      const target = event.detail?.target;
+      if (!(target instanceof HTMLElement) || !target.isConnected) return;
+      constructionQueue.push(target);
+      processConstruction();
     };
 
     window.addEventListener("pointermove", onPointerMove, { passive: true });
@@ -122,6 +163,10 @@ export default function CursorBuildPointers() {
     window.addEventListener("cursorbuild:construct", onConstruct);
 
     return () => {
+      alive = false;
+      constructionTimers.forEach((timer) => window.clearTimeout(timer));
+      constructionTimers.clear();
+      constructionQueue.length = 0;
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("cursorbuild:construct", onConstruct);
