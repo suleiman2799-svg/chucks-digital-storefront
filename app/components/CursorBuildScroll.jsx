@@ -56,10 +56,12 @@ export default function CursorBuildScroll() {
     if (demoMode) {
       document.documentElement.classList.add("cursorbuild-demo-lock");
       document.body.classList.add("cursorbuild-demo-lock");
-      elements.forEach((element) => {
-        window.dispatchEvent(new CustomEvent("cursorbuild:construct", {
-          detail: { target: element }
-        }));
+      window.requestAnimationFrame(() => {
+        elements.forEach((element) => {
+          window.dispatchEvent(new CustomEvent("cursorbuild:construct", {
+            detail: { target: element }
+          }));
+        });
       });
     } else if ("IntersectionObserver" in window) {
       observer = new IntersectionObserver((entries) => {
