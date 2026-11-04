@@ -21,6 +21,7 @@ export default function CursorBuildPointers() {
       tabletMaxVisible: 2,
       mobileMaxVisible: 2,
       touchMaxVisible: 2,
+      allowExternalResizeTargets: true,
       duration: 0.32,
       ease: "power2.out",
       respectReducedMotion: true,
@@ -64,33 +65,56 @@ export default function CursorBuildPointers() {
       void group.run().catch(() => {}).finally(() => coordination.destroyGroup(groupId));
     };
 
-    // Scroll scenes request a coordinated cursor pass over each element as it enters view.
+    // Each scroll scene now runs a real renderer resize simulation on the
+    // page element itself. The second cursor shadows the work and confirms it.
     const onConstruct = (event) => {
       const target = event.detail?.target;
       if (!(target instanceof HTMLElement) || !target.isConnected) return;
-      const host = hostRef.current;
-      if (!host) return;
-      const hostRect = host.getBoundingClientRect();
+      const bounds = hostRef.current?.getBoundingClientRect();
+      if (!bounds) return;
       const rect = target.getBoundingClientRect();
-      const centerX = rect.left - hostRect.left + rect.width / 2;
-      const centerY = rect.top - hostRect.top + Math.min(rect.height / 2, 90);
-      const visitorPoint = {
-        x: Math.max(8, Math.min(host.clientWidth - 28, centerX - 8)),
-        y: Math.max(8, Math.min(host.clientHeight - 38, centerY - 8))
+      const center = {
+        x: Math.max(12, Math.min(window.innerWidth - 32, rect.left + rect.width / 2 - bounds.left)),
+        y: Math.max(12, Math.min(window.innerHeight - 42, rect.top + rect.height / 2 - bounds.top))
       };
-      const guidePoint = {
-        x: Math.max(8, Math.min(host.clientWidth - 28, centerX + 22)),
-        y: Math.max(8, Math.min(host.clientHeight - 38, centerY + 18))
-      };
+      renderer.moveNaturally("visitor", center, { duration: 0.42, curvature: 0.16, ease: "power2.inOut" });
+      renderer.moveNaturally("chucks-guide", {
+        x: Math.max(12, center.x - 34), y: Math.max(12, center.y + 24)
+      }, { duration: 0.58, curvature: 0.18, ease: "power2.inOut" });
 
-      const visitorMove = renderer.moveNaturally("visitor", visitorPoint, {
-        duration: 0.72, curvature: 0.22, ease: "power2.inOut"
-      });
-      const guideMove = renderer.moveNaturally("chucks-guide", guidePoint, {
-        duration: 0.92, curvature: 0.18, ease: "power2.inOut"
-      });
-      if (visitorMove) visitorMove.eventCallback("onComplete", () => renderer.click("visitor"));
-      if (guideMove) guideMove.eventCallback("onComplete", () => renderer.click("chucks-guide"));
+      // Resize by a restrained amount so the effect is clearly visible without
+      // breaking the page's responsive layout; then restore the original size.
+      const width = Math.max(1, rect.width);
+      const height = Math.max(1, rect.height);
+      const targetWidth = Math.max(48, Math.min(width * 1.035, width + 28));
+      const targetHeight = Math.max(36, Math.min(height * 1.025, height + 20));
+      const build = () => {
+        if (!target.isConnected) return;
+        const timeline = renderer.resize("visitor", {
+          target,
+          to: { width: targetWidth, height: targetHeight },
+          duration: 0.72,
+          curvature: 0.2,
+          handle: "bottom-right"
+        });
+        if (timeline) {
+          timeline.eventCallback("onComplete", () => {
+            renderer.click("chucks-guide", { style: "ripple-press", duration: 0.24, intensity: 0.45 });
+            window.setTimeout(() => {
+              if (!target.isConnected) return;
+              const restore = renderer.resize("visitor", {
+                target,
+                to: { width, height },
+                duration: 0.52,
+                curvature: 0.16,
+                handle: "bottom-right"
+              });
+              restore?.eventCallback("onComplete", () => renderer.click("visitor", { duration: 0.2 }));
+            }, 180);
+          });
+        }
+      };
+      window.setTimeout(build, 460);
     };
 
     window.addEventListener("pointermove", onPointerMove, { passive: true });
