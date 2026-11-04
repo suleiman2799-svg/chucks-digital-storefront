@@ -59,6 +59,12 @@ export default function CursorBuildScroll() {
     const demoMode = new URLSearchParams(window.location.search).get("cursorbuild") === "demo";
     let observer;
     let demoLocked = false;
+    const completedTargets = new Set();
+    const markComplete = (event) => {
+      if (elements.includes(event.detail?.target)) completedTargets.add(event.detail.target);
+      if (completedTargets.size === elements.length) window.dispatchEvent(new CustomEvent("cursorbuild:all-complete"));
+    };
+    window.addEventListener("cursorbuild:complete", markComplete);
     const blockDemoScroll = (event) => {
       if (demoLocked) event.preventDefault();
     };
@@ -142,6 +148,7 @@ export default function CursorBuildScroll() {
 
     return () => {
       observer?.disconnect();
+      window.removeEventListener("cursorbuild:complete", markComplete);
       window.removeEventListener("wheel", blockDemoScroll);
       window.removeEventListener("touchmove", blockDemoScroll);
       window.removeEventListener("keydown", blockDemoKeys);
