@@ -4,23 +4,25 @@ import { useEffect } from "react";
 import { gsap } from "gsap";
 
 const BUILD_SELECTORS = [
-  ".arrival-nav .arrival-brand",
+  // First wave: one dedicated designer per key hero element.
+  ".arrival-copy .arrival-logo-reveal",
   ".arrival-nav .arrival-nav-links a:nth-child(1)",
   ".arrival-nav .arrival-nav-links a:nth-child(2)",
   ".arrival-nav .arrival-nav-links a:nth-child(3)",
   ".arrival-nav .arrival-nav-cta",
-  ".arrival-coordinate",
-  ".arrival-orbit",
-  ".arrival-hero-video",
-  ".arrival-copy .arrival-logo-reveal",
-  ".arrival-copy .arrival-kicker",
   ".arrival-copy h1",
   ".arrival-copy > p",
-  ".arrival-copy .arrival-actions",
+  ".arrival-hero-video",
   ".arrival-hero .architecture",
+  ".arrival-coordinate",
+  ".arrival-orbit",
+  ".hero-bottomline",
+  // Remaining team members take the supporting hero details and next sections.
+  ".arrival-nav .arrival-brand",
+  ".arrival-copy .arrival-kicker",
+  ".arrival-copy .arrival-actions",
   ".arrival-hero .marker-a",
   ".arrival-hero .marker-b",
-  ".hero-bottomline",
   ".vertical-note",
   ".arrival-intro .intro-content",
   ".arrival-intro .intro-stamp",
