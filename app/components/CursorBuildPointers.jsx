@@ -97,6 +97,7 @@ export default function CursorBuildPointers() {
     let assignmentIndex = 0;
     let alive = true;
     let trailFrame = 0;
+    let sectionActive = false;
 
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
     const cursorPoint = (x, y) => ({
@@ -114,7 +115,7 @@ export default function CursorBuildPointers() {
         const x = Number(gsap.getProperty(node, "x")) || 0;
         const y = Number(gsap.getProperty(node, "y")) || 0;
         trails[index].style.transform = `translate3d(${x + 7}px,${y + 13}px,0)`;
-        trails[index].style.opacity = busy[index] ? "0.38" : "0.16";
+        trails[index].style.opacity = sectionActive ? (busy[index] ? "0.38" : "0.16") : "0";
       });
       trailFrame = window.requestAnimationFrame(updateTrails);
     };
@@ -259,13 +260,18 @@ export default function CursorBuildPointers() {
       if (alive && queues[cursorIndex].length) pump(cursorIndex);
     };
 
-    const onAllComplete = () => {
+    const onSectionStart = () => {
+      sectionActive = true;
+      host.classList.remove("cursorbuild-team-finished");
+      gsap.to([...cursorNodes, ...trails].filter(Boolean), {
+        autoAlpha: 1, duration: 0.2, ease: "power2.out", overwrite: true
+      });
+    };
+    const onSectionComplete = () => {
+      sectionActive = false;
       host.classList.add("cursorbuild-team-finished");
       gsap.to([...cursorNodes, ...trails].filter(Boolean), {
-        autoAlpha: 0,
-        duration: 0.4,
-        ease: "power2.out",
-        overwrite: true
+        autoAlpha: 0, duration: 0.4, ease: "power2.out", overwrite: true
       });
     };
 
@@ -279,12 +285,14 @@ export default function CursorBuildPointers() {
     };
 
     window.addEventListener("cursorbuild:construct", onConstruct);
-    window.addEventListener("cursorbuild:all-complete", onAllComplete);
+    window.addEventListener("cursorbuild:section-start", onSectionStart);
+    window.addEventListener("cursorbuild:section-complete", onSectionComplete);
     return () => {
       alive = false;
       window.cancelAnimationFrame(trailFrame);
       window.removeEventListener("cursorbuild:construct", onConstruct);
-      window.removeEventListener("cursorbuild:all-complete", onAllComplete);
+      window.removeEventListener("cursorbuild:section-start", onSectionStart);
+      window.removeEventListener("cursorbuild:section-complete", onSectionComplete);
       guides.forEach((guide) => guide.remove());
       guides.clear();
       trails.forEach((trail) => trail.remove());
