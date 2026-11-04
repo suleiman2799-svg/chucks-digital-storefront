@@ -1,4 +1,4 @@
-import type { CursorIdentity, Unsubscribe } from "../types.ts";
+import type { CursorIdentity, Unsubscribe } from "../types";
 /** Identity registry only; rendering and pointer tracking belong to adapters. */
 export class CursorManager {
  private readonly cursors = new Map<string, CursorIdentity>();
