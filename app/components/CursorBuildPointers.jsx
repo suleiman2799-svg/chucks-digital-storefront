@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { CursorManager } from "../../lib/cursorbuild/cursor-manager";
 import { CursorRenderer } from "../../lib/cursorbuild/cursor-renderer";
+import { MultiCursorCoordinationEngine } from "../../lib/cursorbuild/multi-cursor-coordination-engine";
 
 export default function CursorBuildPointers() {
   const hostRef = useRef(null);
@@ -14,6 +15,7 @@ export default function CursorBuildPointers() {
     manager.add({ id: "visitor", name: "You", color: "#C83A8F" });
     manager.add({ id: "chucks-guide", name: "Chucks guide", color: "#0BAE4E" });
 
+    const coordination = new MultiCursorCoordinationEngine();
     const renderer = new CursorRenderer(manager, hostRef.current, {
       maxVisible: 2,
       tabletMaxVisible: 2,
@@ -42,10 +44,20 @@ export default function CursorBuildPointers() {
         }, 0.48);
       });
     };
+    let clickSequence = 0;
     const onPointerDown = (event) => {
-      if (event.pointerType === "mouse" || event.pointerType === "pen") {
-        renderer.click("visitor");
-      }
+      if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+      const groupId = "pointer-click-" + (++clickSequence);
+      const visitorTrack = coordination.createTimeline("visitor", [{
+        id: groupId + "-visitor",
+        run: ({ cursorId }) => renderer.click(cursorId)
+      }], { mode: "parallel" });
+      const guideTrack = coordination.createTimeline("chucks-guide", [{
+        id: groupId + "-guide",
+        run: ({ cursorId }) => renderer.click(cursorId)
+      }], { mode: "parallel" });
+      const group = coordination.createGroup(groupId, [visitorTrack, guideTrack]);
+      void group.run().catch(() => {}).finally(() => coordination.destroyGroup(groupId));
     };
 
     window.addEventListener("pointermove", onPointerMove, { passive: true });
@@ -55,6 +67,7 @@ export default function CursorBuildPointers() {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerdown", onPointerDown);
       if (frame) window.cancelAnimationFrame(frame);
+      coordination.destroy();
       renderer.destroy();
       manager.destroy();
     };
