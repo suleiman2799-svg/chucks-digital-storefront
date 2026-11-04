@@ -134,11 +134,6 @@ export default function CursorBuildPointers() {
       }, 0);
       showCursor();
 
-      const approach = renderer.moveNaturally(agent, {
-        x: Math.max(10, startPoint.x - 54),
-        y: Math.max(10, startPoint.y - 42)
-      }, { duration: 0.01, curvature: 0.12, ease: "power2.inOut" });
-
       const beginResize = () => {
         if (!alive || !target.isConnected) {
           hideCursor();
@@ -176,8 +171,7 @@ export default function CursorBuildPointers() {
         }
       };
 
-      if (approach) approach.eventCallback("onComplete", beginResize);
-      else beginResize();
+      beginResize();
     };
 
     const onConstruct = (event) => {
