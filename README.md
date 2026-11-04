@@ -18,3 +18,4 @@ The root route (`/`) is the standalone Chucks brand arrival experience. The exis
 
 ## Performance
 CSS-built product illustrations and facade scene, responsive layouts, mobile snap scrolling and reduced-motion support.
+<!-- trigger deploy -->
