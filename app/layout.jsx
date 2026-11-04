@@ -1,5 +1,4 @@
 import "./globals.css";
-import CursorBuildScroll from "./components/CursorBuildScroll";
 
 export const metadata = {
   title: "Chucks Shopping Mall — More Than a Place to Shop",
