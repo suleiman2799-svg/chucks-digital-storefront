@@ -1,5 +1,6 @@
 import "./globals.css";
 import CursorBuildPointers from "./components/CursorBuildPointers";
+import CursorBuildScroll from "./components/CursorBuildScroll";
 
 export const metadata = {
   title: "Chucks Shopping Mall — More Than a Place to Shop",
@@ -7,5 +8,5 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  return <html lang="en"><body>{children}<CursorBuildPointers /></body></html>;
+  return <html lang="en"><body>{children}<CursorBuildScroll /><CursorBuildPointers /></body></html>;
 }
