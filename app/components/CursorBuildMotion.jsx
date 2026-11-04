@@ -14,7 +14,7 @@ export default function CursorBuildMotion() {
     const animate = (selector, options = {}) => {
       const elements = document.querySelectorAll(selector);
       if (!elements.length) return;
-      cleanups.push(engine.stagger(elements, {
+      cleanups.push(engine.stagger(Array.from(elements), {
         from: { opacity: 0, y: 28 },
         to: { opacity: 1, y: 0 },
         duration: options.duration ?? 0.8,
@@ -29,10 +29,7 @@ export default function CursorBuildMotion() {
     animate(".arrival-invitation .invitation-copy", { duration: 0.9 });
     animate(".arrival-footer .arrival-brand, .arrival-footer .arrival-footer-links", { duration: 0.7, stagger: 0.1 });
 
-    return () => {
-      cleanups.forEach(timeline => timeline && engine.killAll());
-      engine.destroy();
-    };
+    return () => engine.destroy();
   }, []);
 
   return null;
